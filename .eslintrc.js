@@ -21,7 +21,7 @@ module.exports = {
     "spaced-comment": "off",
     "require-jsdoc": "off",
     "react/react-in-jsx-scope": "off",
-    "no-unused-vars": "error",
+    "no-unused-vars": "off",
   },
   settings: {
     react: {
