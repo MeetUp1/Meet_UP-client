@@ -1,6 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
 
+import CreateMeeting from "./component/CreateMeeting";
 import Header from "./component/Header";
 import Login from "./component/Login";
 import MeetingSchedule from "./component/MeetingSchedule";
@@ -9,7 +10,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Header />
-      <MeetingSchedule />
+      <CreateMeeting />
       <StatusBar style="auto" />
     </View>
   );
