@@ -5,12 +5,13 @@ import CreateMeeting from "./component/CreateMeeting";
 import Header from "./component/Header";
 import Login from "./component/Login";
 import MeetingSchedule from "./component/MeetingSchedule";
+import MeetingRequest from "./component/RequestMeeting";
 
 export default function App() {
   return (
     <View style={styles.container}>
       <Header />
-      <CreateMeeting />
+      <MeetingRequest />
       <StatusBar style="auto" />
     </View>
   );

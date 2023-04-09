@@ -23,6 +23,7 @@ module.exports = {
     "react/prop-types": "off",
     "react/react-in-jsx-scope": "off",
     "no-unused-vars": "off",
+    "no-const-assign": "off",
   },
   settings: {
     react: {
