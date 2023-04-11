@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -102,6 +103,15 @@ export default function CreateMeeting() {
   const month = date.getMonth();
   const year = date.getFullYear();
 
+  const navigation = useNavigation();
+
+  const handleMeetingSchedule = () => {
+    navigation.navigate("MeetingSchedule", {
+      showSnackbar: true,
+      text: "미팅일정등록이 완료 되었습니다.",
+    });
+  };
+
   const onPrevMonth = () => {
     runOnJS(setDate)(new Date(year, month - 1, 1));
   };
@@ -149,7 +159,7 @@ export default function CreateMeeting() {
   });
 
   return (
-    <ScrollView>
+    <ScrollView style={styles.scrollContainer}>
       <Text style={styles.titleText}>미팅 가능한 날짜를 선택해 주세요.</Text>
       <View style={styles.container}>
         <CalendarHeader
@@ -226,7 +236,7 @@ export default function CreateMeeting() {
           })}
       </View>
       <View style={styles.container}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleMeetingSchedule}>
           <Text style={styles.buttonText}>시간등록</Text>
         </TouchableOpacity>
       </View>
@@ -235,13 +245,17 @@ export default function CreateMeeting() {
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    backgroundColor: "#fff",
+    flex: 1,
+  },
   container: {
     backgroundColor: "#fff",
     alignItems: "center",
     marginTop: 20,
   },
   titleText: {
-    marginTop: 10,
+    marginTop: 20,
     marginLeft: 20,
     fontSize: 15,
     fontWeight: "bold",

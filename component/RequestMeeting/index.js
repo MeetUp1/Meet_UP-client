@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/native";
 import React, { useState, useRef } from "react";
 import {
   StyleSheet,
@@ -33,6 +34,21 @@ export default function MeetingRequest() {
 
   const stepAnimation = useRef(new Animated.Value(0)).current;
 
+  const navigation = useNavigation();
+
+  const handleMeetingSchedule = () => {
+    navigation.navigate("MeetingSchedule", {
+      showSnackbar: true,
+      text: "미팅신청이 완료 되었습니다.",
+    });
+
+    setSearchUser("");
+    setFoundUsers([]);
+    setSelectedUser(null);
+    setStep(1);
+    stepAnimation.setValue(0);
+  };
+
   const search = (text) => {
     setSearchUser(text);
     const users = mockDate.filter((user) => user.name === text);
@@ -67,7 +83,7 @@ export default function MeetingRequest() {
   };
 
   return (
-    <ScrollView>
+    <ScrollView style={styles.scrollContainer}>
       <View style={styles.container}>
         <View style={styles.stepContainer}>
           <View
@@ -188,7 +204,10 @@ export default function MeetingRequest() {
                     />
                   </View>
                 </View>
-                <TouchableOpacity style={styles.nextButton}>
+                <TouchableOpacity
+                  style={styles.nextButton}
+                  onPress={handleMeetingSchedule}
+                >
                   <Text style={styles.nextButtonText}>완료</Text>
                 </TouchableOpacity>
               </View>
@@ -201,6 +220,10 @@ export default function MeetingRequest() {
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    backgroundColor: "#fff",
+    flex: 1,
+  },
   container: {
     alignItems: "center",
     justifyContent: "center",

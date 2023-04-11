@@ -1,8 +1,15 @@
+import { useNavigation } from "@react-navigation/native";
 import React, { useState, useEffect } from "react";
 import { StyleSheet, View, TouchableOpacity, Animated } from "react-native";
 
 export default function Login() {
   const [animatedValue, setAnimatedValue] = useState(new Animated.Value(0));
+
+  const navigation = useNavigation();
+
+  const handleLogin = () => {
+    navigation.navigate("CreateMeeting");
+  };
 
   useEffect(() => {
     Animated.loop(
@@ -48,7 +55,7 @@ export default function Login() {
           !
         </Animated.Text>
       </View>
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Animated.Text style={[styles.buttonText]}>Log in</Animated.Text>
       </TouchableOpacity>
     </View>
@@ -57,6 +64,7 @@ export default function Login() {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#fff",

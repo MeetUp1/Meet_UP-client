@@ -1,7 +1,22 @@
+import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
 
 export default function Header() {
+  const navigation = useNavigation();
+
+  const handleCreateMeeting = () => {
+    navigation.navigate("CreateMeeting");
+  };
+  const handleMeetingInfo = () => {
+    navigation.navigate("MeetingInfo");
+  };
+  const handleMeetingSchedule = () => {
+    navigation.navigate("MeetingSchedule");
+  };
+  const handleMeetingRequest = () => {
+    navigation.navigate("MeetingRequest");
+  };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -19,16 +34,16 @@ export default function Header() {
         </View>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleMeetingSchedule}>
           <Text style={styles.buttonText}>미팅일정</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleMeetingInfo}>
           <Text style={styles.buttonText}>미팅확인</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleMeetingRequest}>
           <Text style={styles.buttonText}>미팅신청</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleCreateMeeting}>
           <Text style={styles.buttonText}>미팅생성</Text>
         </TouchableOpacity>
       </View>
@@ -39,10 +54,8 @@ export default function Header() {
 const styles = StyleSheet.create({
   container: {
     marginTop: 50,
-    marginBottom: 10,
     backgroundColor: "#fff",
     alignItems: "center",
-    justifyContent: "flex-start",
   },
   header: {
     flexDirection: "row",

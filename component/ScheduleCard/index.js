@@ -25,11 +25,11 @@ const ScheduleCard = ({ name, time, agenda, address }) => {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#f8f8f8",
-    borderRadius: 10,
+    borderRadius: 20,
     marginTop: 10,
-    padding: 15,
     marginBottom: 10,
-    width: "100%",
+    padding: 15,
+    width: "80%",
   },
   cardTitle: {
     fontSize: 18,

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,6 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
+import { Snackbar } from "react-native-paper";
 import Animated, {
   useSharedValue,
   useAnimatedGestureHandler,
@@ -96,7 +97,8 @@ const MonthView = ({ month, year }) => {
   );
 };
 
-export default function MeetingSchedule() {
+export default function MeetingSchedule({ route }) {
+  const [visibleSnackbar, setVisibleSnackbar] = useState(false);
   const [date, setDate] = useState(new Date());
   const month = date.getMonth();
   const year = date.getFullYear();
@@ -135,68 +137,91 @@ export default function MeetingSchedule() {
     };
   });
 
+  const onDismissSnackBar = () => {
+    setVisibleSnackbar(false);
+  };
+
+  useEffect(() => {
+    if (route.params && route.params.showSnackbar) {
+      setVisibleSnackbar(true);
+    }
+  }, [route]);
+
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <CalendarHeader
-          month={month}
-          year={year}
-          onPrev={onPrevMonth}
-          onNext={onNextMonth}
-        />
-        <PanGestureHandler onGestureEvent={onGestureEvent}>
-          <Animated.View style={animatedStyle}>
-            <View style={styles.monthWrapper}>
-              <MonthView month={month} year={year} />
-            </View>
-          </Animated.View>
-        </PanGestureHandler>
-        <ScheduleCard
-          name="이상혁"
-          time="10:00 AM"
-          agenda="어쩌구저쩌구~~"
-          address="어쩌구저쩌구~~"
-        />
-        <ScheduleCard
-          name="이상혁"
-          time="10:00 AM"
-          agenda="어쩌구저쩌구~~"
-          address="어쩌구저쩌구~~"
-        />
-        <ScheduleCard
-          name="이상혁"
-          time="10:00 AM"
-          agenda="어쩌구저쩌구~~"
-          address="어쩌구저쩌구~~"
-        />
-        <ScheduleCard
-          name="이상혁"
-          time="10:00 AM"
-          agenda="어쩌구저쩌구~~"
-          address="어쩌구저쩌구~~"
-        />
-        <ScheduleCard
-          name="이상혁"
-          time="10:00 AM"
-          agenda="어쩌구저쩌구~~"
-          address="어쩌구저쩌구~~"
-        />
-        <ScheduleCard
-          name="이상혁"
-          time="10:00 AM"
-          agenda="어쩌구저쩌구~~"
-          address="어쩌구저쩌구~~"
-        />
-      </View>
-    </ScrollView>
+    <>
+      <ScrollView style={styles.scrollContainer}>
+        <View style={styles.container}>
+          <CalendarHeader
+            month={month}
+            year={year}
+            onPrev={onPrevMonth}
+            onNext={onNextMonth}
+          />
+          <PanGestureHandler onGestureEvent={onGestureEvent}>
+            <Animated.View style={animatedStyle}>
+              <View style={styles.monthWrapper}>
+                <MonthView month={month} year={year} />
+              </View>
+            </Animated.View>
+          </PanGestureHandler>
+          <ScheduleCard
+            name="이상혁"
+            time="10:00 AM"
+            agenda="어쩌구저쩌구~~"
+            address="어쩌구저쩌구~~"
+          />
+          <ScheduleCard
+            name="이상혁"
+            time="10:00 AM"
+            agenda="어쩌구저쩌구~~"
+            address="어쩌구저쩌구~~"
+          />
+          <ScheduleCard
+            name="이상혁"
+            time="10:00 AM"
+            agenda="어쩌구저쩌구~~"
+            address="어쩌구저쩌구~~"
+          />
+          <ScheduleCard
+            name="이상혁"
+            time="10:00 AM"
+            agenda="어쩌구저쩌구~~"
+            address="어쩌구저쩌구~~"
+          />
+          <ScheduleCard
+            name="이상혁"
+            time="10:00 AM"
+            agenda="어쩌구저쩌구~~"
+            address="어쩌구저쩌구~~"
+          />
+          <ScheduleCard
+            name="이상혁"
+            time="10:00 AM"
+            agenda="어쩌구저쩌구~~"
+            address="어쩌구저쩌구~~"
+          />
+        </View>
+      </ScrollView>
+      <Snackbar
+        style={styles.snackbar}
+        visible={visibleSnackbar}
+        onDismiss={onDismissSnackBar}
+        duration={Snackbar.DURATION_SHORT}
+      >
+        {route.params?.text || "미팅 일정을 한번 더 클릭하셨습니다"}
+      </Snackbar>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    backgroundColor: "#fff",
+    flex: 1,
+  },
   container: {
     backgroundColor: "#fff",
     alignItems: "center",
-    marginTop: 30,
   },
   header: {
     flexDirection: "row",
@@ -205,10 +230,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   headerText: {
+    marginTop: 20,
     fontSize: 30,
     fontWeight: "bold",
   },
   headerButton: {
+    marginTop: 20,
     marginRight: 15,
     marginLeft: 15,
     fontSize: 20,
@@ -217,6 +244,7 @@ const styles = StyleSheet.create({
   month: {
     flexDirection: "column",
     alignItems: "center",
+    marginBottom: 10,
   },
   weekDaysContainer: {
     flexDirection: "row",
@@ -268,5 +296,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     width: "90%",
+  },
+  snackbar: {
+    position: "absolute",
+    bottom: 30,
+    left: 0,
+    right: 0,
   },
 });

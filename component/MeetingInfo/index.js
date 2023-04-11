@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -124,6 +125,12 @@ export default function MeetingInfo() {
   const [activeButton, setActiveButton] = useState(0);
   const [expandedCards, setExpandedCards] = useState([]);
 
+  const navigation = useNavigation();
+
+  const handleMeetingRequest = () => {
+    navigation.navigate("MeetingRequest");
+  };
+
   const handlePress = (index) => {
     setActiveButton(index);
     setExpandedCards(mockData.map(() => false));
@@ -204,7 +211,7 @@ export default function MeetingInfo() {
                 <View style={styles.meetingButtonContainer}>
                   <TouchableOpacity>
                     <View style={styles.meetingButton}>
-                      <Text style={styles.cardText}>수정</Text>
+                      <Text style={styles.cardText}>수락</Text>
                     </View>
                   </TouchableOpacity>
                   <TouchableOpacity>
@@ -222,9 +229,9 @@ export default function MeetingInfo() {
                   <Text style={styles.cardText}>{meeting.message}</Text>
                 </View>
                 <View style={styles.meetingButtonContainer}>
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={handleMeetingRequest}>
                     <View style={styles.meetingButton}>
-                      <Text style={styles.cardText}>수락</Text>
+                      <Text style={styles.cardText}>수정</Text>
                     </View>
                   </TouchableOpacity>
                   <TouchableOpacity>
@@ -254,7 +261,7 @@ export default function MeetingInfo() {
   );
 
   return (
-    <ScrollView>
+    <ScrollView style={styles.scrollContainer}>
       <View style={styles.container}>
         <View style={styles.divider} />
         <View style={styles.buttonContainer}>
@@ -272,6 +279,10 @@ export default function MeetingInfo() {
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    backgroundColor: "#fff",
+    flex: 1,
+  },
   container: {
     backgroundColor: "#fff",
     marginTop: 5,
