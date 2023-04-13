@@ -1,3 +1,4 @@
+import { CLIENT_ID, IOS_CLIENT_ID, LOGIN_API_URL } from "@env";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import * as Google from "expo-auth-session/providers/google";
@@ -18,10 +19,8 @@ export default function Login() {
   const navigation = useNavigation();
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId:
-      "760691643877-o33uruvobddb5dqheoci9cfdarig3sut.apps.googleusercontent.com",
-    iosClientId:
-      "760691643877-rdt1f3ccve1f8qgfjcam41h0qdmj868t.apps.googleusercontent.com",
+    clientId: CLIENT_ID,
+    iosClientId: IOS_CLIENT_ID,
     prompt: "select_account",
   });
 
@@ -49,7 +48,7 @@ export default function Login() {
       if (user) {
         dispatch(userLogin(user));
         navigation.navigate("CreateMeeting");
-        await axios.post("http:localhost:8000/api/users/login", {
+        await axios.post(`${LOGIN_API_URL}/api/users/login`, {
           user,
         });
       }
