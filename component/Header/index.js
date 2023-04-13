@@ -1,9 +1,11 @@
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
+import { useSelector } from "react-redux";
 
 export default function Header() {
   const navigation = useNavigation();
+  const { currentUser } = useSelector((state) => state);
 
   const handleCreateMeeting = () => {
     navigation.navigate("CreateMeeting");
@@ -25,12 +27,14 @@ export default function Header() {
           <View style={styles.profileImgContainer}>
             <Image
               source={{
-                uri: "https://lh3.googleusercontent.com/a/AGNmyxa5mqAs837yjRYEkSvflqIJV3vnOFxU3yjyTpd_=s96-c",
+                uri: currentUser.picture,
               }}
               style={styles.profileImg}
             />
           </View>
-          <Text style={styles.profileText}>상혁님 안녕하세요</Text>
+          <Text style={styles.profileText}>
+            {currentUser.name}님 안녕하세요
+          </Text>
         </View>
       </View>
       <View style={styles.buttonContainer}>

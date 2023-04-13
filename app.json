@@ -2,6 +2,7 @@
   "expo": {
     "name": "MeetUp-client",
     "slug": "MeetUp-client",
+    "scheme": "MeetUp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,9 +14,11 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.meetup.login"
     },
     "android": {
+      "package": "com.meetup.login",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
