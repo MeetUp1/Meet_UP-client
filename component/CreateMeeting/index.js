@@ -1,5 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -15,6 +16,7 @@ import Animated, {
   withSpring,
   runOnJS,
 } from "react-native-reanimated";
+import { useSelector } from "react-redux";
 
 const getDaysInMonth = (month, year) => {
   return new Date(year, month + 1, 0).getDate();
@@ -36,11 +38,9 @@ const CalendarHeader = ({ month, year, onPrev, onNext }) => (
   </View>
 );
 
-const MonthView = ({ month, year }) => {
+const MonthView = ({ month, year, selectedDate, setSelectedDate }) => {
   const daysInMonth = getDaysInMonth(month, year);
   const firstDayInMonth = getFirstDayInMonth(month, year);
-
-  const [selectedDate, setSelectedDate] = useState(null);
 
   const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
   const today = new Date();
@@ -99,17 +99,46 @@ export default function CreateMeeting() {
   const [date, setDate] = useState(new Date());
   const [timePeriod, setTimePeriod] = useState("AM");
   const [selectedHours, setSelectedHours] = useState([]);
+  const [dateHours, setDateHours] = useState({});
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  const { currentUser } = useSelector((state) => state);
 
   const month = date.getMonth();
   const year = date.getFullYear();
 
   const navigation = useNavigation();
 
-  const handleMeetingSchedule = () => {
+  const handleMeetingSchedule = async () => {
     navigation.navigate("MeetingSchedule", {
       showSnackbar: true,
       text: "미팅일정등록이 완료 되었습니다.",
     });
+    await axios.patch(`http://localhost:8000/api/users/${currentUser.id}`, {
+      dateHours,
+    });
+  };
+
+  const updateDateHours = (date, hour) => {
+    const dateString = date.toISOString().split("T")[0];
+    const hourString = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      hour,
+    ).toISOString();
+
+    if (dateHours[dateString]?.includes(hourString)) {
+      setDateHours({
+        ...dateHours,
+        [dateString]: dateHours[dateString].filter((h) => h !== hourString),
+      });
+    } else {
+      setDateHours({
+        ...dateHours,
+        [dateString]: [...(dateHours[dateString] || []), hourString].sort(),
+      });
+    }
   };
 
   const onPrevMonth = () => {
@@ -129,6 +158,9 @@ export default function CreateMeeting() {
       setSelectedHours(selectedHours.filter((selected) => selected !== hour));
     } else {
       setSelectedHours([...selectedHours, hour]);
+    }
+    if (selectedDate) {
+      updateDateHours(selectedDate, hour);
     }
   };
 
@@ -158,6 +190,29 @@ export default function CreateMeeting() {
     };
   });
 
+  useEffect(() => {
+    if (selectedDate) {
+      const selectedDateString = selectedDate.toISOString().split("T")[0];
+      const hours = dateHours[selectedDateString] || [];
+      setSelectedHours(hours.map((hour) => new Date(hour).getHours()));
+    }
+  }, [selectedDate, dateHours]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const response = await axios.get(
+        `http://localhost:8000/api/users/${currentUser.id}`,
+      );
+      if (response.data.openTime[0]) {
+        setDateHours(response.data.openTime[0]);
+
+        return;
+      }
+      setDateHours({});
+    }
+    fetchData();
+  }, [currentUser]);
+
   return (
     <ScrollView style={styles.scrollContainer}>
       <Text style={styles.titleText}>미팅 가능한 날짜를 선택해 주세요.</Text>
@@ -171,7 +226,12 @@ export default function CreateMeeting() {
         <PanGestureHandler onGestureEvent={onGestureEvent}>
           <Animated.View style={animatedStyle}>
             <View style={styles.monthWrapper}>
-              <MonthView month={month} year={year} />
+              <MonthView
+                month={month}
+                year={year}
+                setSelectedDate={setSelectedDate}
+                selectedDate={selectedDate}
+              />
             </View>
           </Animated.View>
         </PanGestureHandler>
