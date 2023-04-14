@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -99,11 +99,11 @@ export default function CreateMeeting() {
   const [date, setDate] = useState(new Date());
   const [timePeriod, setTimePeriod] = useState("AM");
   const [selectedHours, setSelectedHours] = useState([]);
-  const [dateHours, setDateHours] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDateTime, setSelectedDateTime] = useState([]);
 
   const { currentUser } = useSelector((state) => state);
-
+  console.log(selectedDateTime);
   const month = date.getMonth();
   const year = date.getFullYear();
 
@@ -114,30 +114,12 @@ export default function CreateMeeting() {
       showSnackbar: true,
       text: "미팅일정등록이 완료 되었습니다.",
     });
-    await axios.patch(`http://localhost:8000/api/users/${currentUser.id}`, {
-      dateHours,
-    });
-  };
-
-  const updateDateHours = (date, hour) => {
-    const dateString = date.toISOString().split("T")[0];
-    const hourString = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      hour,
-    ).toISOString();
-
-    if (dateHours[dateString]?.includes(hourString)) {
-      setDateHours({
-        ...dateHours,
-        [dateString]: dateHours[dateString].filter((h) => h !== hourString),
+    try {
+      await axios.patch(`http://localhost:8000/api/users/${currentUser.id}`, {
+        selectedDateTime,
       });
-    } else {
-      setDateHours({
-        ...dateHours,
-        [dateString]: [...(dateHours[dateString] || []), hourString].sort(),
-      });
+    } catch (error) {
+      // 오류 화면 렌더링
     }
   };
 
@@ -153,14 +135,18 @@ export default function CreateMeeting() {
     setTimePeriod(period);
   };
 
-  const onHourSelect = (hour) => {
-    if (selectedHours.includes(hour)) {
-      setSelectedHours(selectedHours.filter((selected) => selected !== hour));
+  const onHourSelect = (day, hour) => {
+    const dateTime = new Date(day);
+    dateTime.setHours(hour, 0, 0, 0);
+
+    const dateTimeUTC = dateTime.toISOString();
+
+    if (selectedDateTime.includes(dateTimeUTC)) {
+      setSelectedDateTime(
+        selectedDateTime.filter((selected) => selected !== dateTimeUTC),
+      );
     } else {
-      setSelectedHours([...selectedHours, hour]);
-    }
-    if (selectedDate) {
-      updateDateHours(selectedDate, hour);
+      setSelectedDateTime([...selectedDateTime, dateTimeUTC]);
     }
   };
 
@@ -191,27 +177,15 @@ export default function CreateMeeting() {
   });
 
   useEffect(() => {
-    if (selectedDate) {
-      const selectedDateString = selectedDate.toISOString().split("T")[0];
-      const hours = dateHours[selectedDateString] || [];
-      setSelectedHours(hours.map((hour) => new Date(hour).getHours()));
-    }
-  }, [selectedDate, dateHours]);
-
-  useEffect(() => {
     async function fetchData() {
       const response = await axios.get(
         `http://localhost:8000/api/users/${currentUser.id}`,
       );
-      if (response.data.openTime[0]) {
-        setDateHours(response.data.openTime[0]);
-
-        return;
-      }
-      setDateHours({});
+      const openTime = response.data.openTime || null;
+      setSelectedDateTime(openTime);
     }
     fetchData();
-  }, [currentUser]);
+  }, [currentUser.id]);
 
   return (
     <ScrollView style={styles.scrollContainer}>
@@ -229,8 +203,8 @@ export default function CreateMeeting() {
               <MonthView
                 month={month}
                 year={year}
-                setSelectedDate={setSelectedDate}
                 selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
               />
             </View>
           </Animated.View>
@@ -271,29 +245,38 @@ export default function CreateMeeting() {
         </TouchableOpacity>
       </View>
       <View style={styles.hoursContainer}>
-        {Array(12)
-          .fill(null)
-          .map((_, index) => {
-            const hour = timePeriod === "AM" ? index : index + 12;
-            const isSelected = selectedHours.includes(hour);
+        {selectedDate &&
+          Array(12)
+            .fill(null)
+            .map((_, index) => {
+              const hour = timePeriod === "AM" ? index : index + 12;
+              const isSelected = selectedDateTime.some((dateTime) => {
+                const selected = new Date(dateTime);
+                return (
+                  selected.getDate() === selectedDate.getDate() &&
+                  selected.getMonth() === selectedDate.getMonth() &&
+                  selected.getFullYear() === selectedDate.getFullYear() &&
+                  selected.getHours() === hour
+                );
+              });
 
-            return (
-              <TouchableOpacity
-                key={`hour-${index}`}
-                style={[styles.hour, isSelected && styles.selectedHour]}
-                onPress={() => onHourSelect(hour)}
-              >
-                <Text
-                  style={[
-                    styles.hourText,
-                    isSelected && styles.selectedHourText,
-                  ]}
+              return (
+                <TouchableOpacity
+                  key={`hour-${index}`}
+                  style={[styles.hour, isSelected && styles.selectedHour]}
+                  onPress={() => onHourSelect(selectedDate, hour)}
                 >
-                  {`${hour}:00`}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
+                  <Text
+                    style={[
+                      styles.hourText,
+                      isSelected && styles.selectedHourText,
+                    ]}
+                  >
+                    {`${hour}:00`}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
       </View>
       <View style={styles.container}>
         <TouchableOpacity style={styles.button} onPress={handleMeetingSchedule}>
