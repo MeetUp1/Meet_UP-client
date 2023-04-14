@@ -103,7 +103,7 @@ export default function CreateMeeting() {
   const [selectedDateTime, setSelectedDateTime] = useState([]);
 
   const { currentUser } = useSelector((state) => state);
-  console.log(selectedDateTime);
+
   const month = date.getMonth();
   const year = date.getFullYear();
 
@@ -125,10 +125,12 @@ export default function CreateMeeting() {
 
   const onPrevMonth = () => {
     runOnJS(setDate)(new Date(year, month - 1, 1));
+    runOnJS(setSelectedDate)(new Date(year, month - 1, 1));
   };
 
   const onNextMonth = () => {
     runOnJS(setDate)(new Date(year, month + 1, 1));
+    runOnJS(setSelectedDate)(new Date(year, month + 1, 1));
   };
 
   const onTimePeriodChange = (period) => {
