@@ -1,5 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
-import React, { useState, useRef } from "react";
+import axios from "axios";
+import React, { useState, useRef, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -10,27 +11,21 @@ import {
   ScrollView,
   Animated,
 } from "react-native";
+import { useSelector } from "react-redux";
 
 import RequestCalendar from "../RequestCalendar";
-
-const mockDate = [
-  {
-    name: "이상혁",
-    imgURL:
-      "https://lh3.googleusercontent.com/a/AGNmyxa5mqAs837yjRYEkSvflqIJV3vnOFxU3yjyTpd_=s96-c",
-  },
-  {
-    name: "이상혁",
-    imgURL:
-      "https://lh3.googleusercontent.com/a/AGNmyxa5mqAs837yjRYEkSvflqIJV3vnOFxU3yjyTpd_=s96-c",
-  },
-];
 
 export default function MeetingRequest() {
   const [searchUser, setSearchUser] = useState("");
   const [foundUsers, setFoundUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUser, setSelectedUser] = useState({});
+  const [content, setContent] = useState("");
+  const [address, setAddress] = useState("");
+  const [userList, setUserList] = useState([]);
   const [step, setStep] = useState(1);
+  const [selectUserUTCTime, setSelectUserUTCTime] = useState("");
+
+  const { currentUser } = useSelector((state) => state);
 
   const stepAnimation = useRef(new Animated.Value(0)).current;
 
@@ -44,14 +39,22 @@ export default function MeetingRequest() {
 
     setSearchUser("");
     setFoundUsers([]);
-    setSelectedUser(null);
+    setSelectedUser({});
     setStep(1);
     stepAnimation.setValue(0);
   };
 
-  const search = (text) => {
+  const inputContent = (text) => {
+    setContent(text);
+  };
+
+  const inputAddress = (text) => {
+    setAddress(text);
+  };
+
+  const searchUserName = (text) => {
     setSearchUser(text);
-    const users = mockDate.filter((user) => user.name === text);
+    const users = userList.filter((user) => user.name === text);
     setFoundUsers(users);
   };
 
@@ -82,6 +85,39 @@ export default function MeetingRequest() {
     }).start();
   };
 
+  const handleChangeSchedule = async () => {
+    try {
+      const patchRequest = axios.patch(
+        `http://localhost:8000/api/users/${foundUsers[0].id}/changeTime`,
+        {
+          selectUserUTCTime,
+        },
+      );
+
+      const postRequest = axios.post("http://localhost:8000/api/meetings/new", {
+        title: content,
+        location: address,
+        startTime: selectUserUTCTime,
+        requester: foundUsers[0],
+        requestee: currentUser,
+      });
+
+      handleMeetingSchedule();
+      await Promise.all([patchRequest, postRequest]);
+    } catch (error) {
+      // 오류 화면 렌더링
+    }
+  };
+
+  useEffect(() => {
+    async function fetchData() {
+      const response = await axios.get("http://localhost:8000/api/users/");
+      const userList = response.data;
+      setUserList(userList);
+    }
+    fetchData();
+  }, []);
+
   return (
     <ScrollView style={styles.scrollContainer}>
       <View style={styles.container}>
@@ -102,7 +138,7 @@ export default function MeetingRequest() {
           <TextInput
             style={step === 1 ? styles.input : styles.disabledInput}
             placeholder="유저 이름 검색🔍"
-            onChangeText={search}
+            onChangeText={searchUserName}
             value={searchUser}
             editable={step === 1}
           />
@@ -118,7 +154,7 @@ export default function MeetingRequest() {
                 >
                   <View style={styles.profileImgContainer}>
                     <Image
-                      source={{ uri: user.imgURL }}
+                      source={{ uri: user.picture }}
                       style={styles.profileImg}
                     />
                   </View>
@@ -154,7 +190,11 @@ export default function MeetingRequest() {
                 </View>
                 <Text style={styles.stepTitleText}>날짜를 선택해주세요</Text>
               </View>
-              <RequestCalendar nextStep={nextStep} />
+              <RequestCalendar
+                nextStep={nextStep}
+                selectedUser={selectedUser}
+                setSelectUserUTCTime={setSelectUserUTCTime}
+              />
             </View>
           )}
         </Animated.View>
@@ -193,6 +233,7 @@ export default function MeetingRequest() {
                   <View style={styles.meetingContentContainer}>
                     <TextInput
                       style={styles.contentInput}
+                      onChangeText={inputContent}
                       placeholder="미팅 안건을 입력 해주세요"
                     />
                   </View>
@@ -200,13 +241,15 @@ export default function MeetingRequest() {
                   <View style={styles.meetingContentContainer}>
                     <TextInput
                       style={styles.contentInput}
+                      onChangeText={inputAddress}
                       placeholder="미팅 주소를 입력 해주세요"
                     />
                   </View>
                 </View>
                 <TouchableOpacity
                   style={styles.nextButton}
-                  onPress={handleMeetingSchedule}
+                  // onPress={handleMeetingSchedule}
+                  onPress={handleChangeSchedule}
                 >
                   <Text style={styles.nextButtonText}>완료</Text>
                 </TouchableOpacity>

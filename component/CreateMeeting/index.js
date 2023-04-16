@@ -98,7 +98,6 @@ const MonthView = ({ month, year, selectedDate, setSelectedDate }) => {
 export default function CreateMeeting() {
   const [date, setDate] = useState(new Date());
   const [timePeriod, setTimePeriod] = useState("AM");
-  const [selectedHours, setSelectedHours] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedDateTime, setSelectedDateTime] = useState([]);
 

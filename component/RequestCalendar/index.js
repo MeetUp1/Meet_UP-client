@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useState, useEffect, useMemo } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
 import Animated, {
@@ -29,11 +30,9 @@ const CalendarHeader = ({ month, year, onPrev, onNext }) => (
   </View>
 );
 
-const MonthView = ({ month, year }) => {
+const MonthView = ({ month, year, selectedDate, setSelectedDate }) => {
   const daysInMonth = getDaysInMonth(month, year);
   const firstDayInMonth = getFirstDayInMonth(month, year);
-
-  const [selectedDate, setSelectedDate] = useState(null);
 
   const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
   const today = new Date();
@@ -88,10 +87,16 @@ const MonthView = ({ month, year }) => {
   );
 };
 
-export default function RequestCalendar({ nextStep }) {
+export default function RequestCalendar({
+  nextStep,
+  selectedUser,
+  setSelectUserUTCTime,
+}) {
   const [date, setDate] = useState(new Date());
   const [timePeriod, setTimePeriod] = useState("AM");
   const [selectedHours, setSelectedHours] = useState([]);
+  const [selectUserTime, setSelectUserTime] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const month = date.getMonth();
   const year = date.getFullYear();
@@ -109,11 +114,9 @@ export default function RequestCalendar({ nextStep }) {
   };
 
   const onHourSelect = (hour) => {
-    if (selectedHours.includes(hour)) {
-      setSelectedHours(selectedHours.filter((selected) => selected !== hour));
-    } else {
-      setSelectedHours([...selectedHours, hour]);
-    }
+    const utcDate = convertToUTCDate(selectedDate, hour);
+    setSelectUserUTCTime(utcDate);
+    setSelectedHours([hour]);
   };
 
   const translateX = useSharedValue(0);
@@ -142,6 +145,46 @@ export default function RequestCalendar({ nextStep }) {
     };
   });
 
+  const convertToLocalDate = (utcDate) => {
+    const date = new Date(utcDate);
+    return date;
+  };
+
+  const localUserTimes = useMemo(() => {
+    if (!selectedDate) {
+      return [];
+    }
+    return selectUserTime
+      .map((time) => convertToLocalDate(time))
+      .filter(
+        (time) =>
+          time.getFullYear() === selectedDate.getFullYear() &&
+          time.getMonth() === selectedDate.getMonth() &&
+          time.getDate() === selectedDate.getDate(),
+      );
+  }, [selectUserTime, selectedDate]);
+
+  const convertToUTCDate = (localDate, hour) => {
+    const date = new Date(localDate);
+    date.setHours(hour, 0, 0, 0);
+    return date.toISOString();
+  };
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/api/users/${selectedUser.id}`,
+        );
+        const openTime = response.data.openTime || null;
+        setSelectUserTime(openTime);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    }
+    fetchData();
+  }, [selectedUser.id]);
+
   return (
     <View>
       <View style={styles.container}>
@@ -154,7 +197,12 @@ export default function RequestCalendar({ nextStep }) {
         <PanGestureHandler onGestureEvent={onGestureEvent}>
           <Animated.View style={animatedStyle}>
             <View style={styles.monthWrapper}>
-              <MonthView month={month} year={year} />
+              <MonthView
+                month={month}
+                year={year}
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+              />
             </View>
           </Animated.View>
         </PanGestureHandler>
@@ -199,17 +247,26 @@ export default function RequestCalendar({ nextStep }) {
           .map((_, index) => {
             const hour = timePeriod === "AM" ? index : index + 12;
             const isSelected = selectedHours.includes(hour);
+            const isAvailable = localUserTimes.some(
+              (time) => time.getHours() === hour,
+            );
 
             return (
               <TouchableOpacity
                 key={`hour-${index}`}
-                style={[styles.hour, isSelected && styles.selectedHour]}
-                onPress={() => onHourSelect(hour)}
+                style={[
+                  styles.hour,
+                  isSelected && styles.selectedHour,
+                  !isAvailable && styles.unavailableHour,
+                ]}
+                onPress={() => isAvailable && onHourSelect(hour)}
+                disabled={!isAvailable}
               >
                 <Text
                   style={[
                     styles.hourText,
                     isSelected && styles.selectedHourText,
+                    !isAvailable && styles.unavailableHourText,
                   ]}
                 >
                   {`${hour}:00`}
@@ -385,5 +442,11 @@ const styles = StyleSheet.create({
   nextButtonText: {
     fontSize: 20,
     fontWeight: "bold",
+  },
+  unavailableHour: {
+    backgroundColor: "#f0f0f0",
+  },
+  unavailableHourText: {
+    color: "#999",
   },
 });
