@@ -1,6 +1,7 @@
-import { useNavigation } from "@react-navigation/native";
+import { LOGIN_API_URL } from "@env";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import axios from "axios";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import {
   StyleSheet,
   View,
@@ -87,36 +88,42 @@ export default function MeetingRequest() {
 
   const handleChangeSchedule = async () => {
     try {
-      const patchRequest = axios.patch(
-        `http://localhost:8000/api/users/${foundUsers[0].id}/changeTime`,
+      const patchRequest = await axios.patch(
+        `${LOGIN_API_URL}/api/users/${foundUsers[0].id}/changeTime`,
         {
           selectUserUTCTime,
         },
       );
-
-      const postRequest = axios.post("http://localhost:8000/api/meetings/new", {
-        title: content,
-        location: address,
-        startTime: selectUserUTCTime,
-        requester: foundUsers[0],
-        requestee: currentUser,
-      });
-
-      handleMeetingSchedule();
-      await Promise.all([patchRequest, postRequest]);
+      if (patchRequest.status === 200) {
+        const postRequest = await axios.post(
+          `${LOGIN_API_URL}/api/meetings/new`,
+          {
+            title: content,
+            location: address,
+            startTime: selectUserUTCTime,
+            requester: foundUsers[0],
+            requestee: currentUser,
+          },
+        );
+        if (postRequest.status === 200) {
+          handleMeetingSchedule();
+        }
+      }
     } catch (error) {
       // 오류 화면 렌더링
     }
   };
 
-  useEffect(() => {
-    async function fetchData() {
-      const response = await axios.get("http://localhost:8000/api/users/");
-      const userList = response.data;
-      setUserList(userList);
-    }
-    fetchData();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      async function fetchData() {
+        const response = await axios.get(`${LOGIN_API_URL}/api/users/`);
+        const userList = response.data;
+        setUserList(userList);
+      }
+      fetchData();
+    }, []),
+  );
 
   return (
     <ScrollView style={styles.scrollContainer}>
@@ -248,7 +255,6 @@ export default function MeetingRequest() {
                 </View>
                 <TouchableOpacity
                   style={styles.nextButton}
-                  // onPress={handleMeetingSchedule}
                   onPress={handleChangeSchedule}
                 >
                   <Text style={styles.nextButtonText}>완료</Text>

@@ -1,6 +1,7 @@
-import { useNavigation } from "@react-navigation/native";
+import { LOGIN_API_URL } from "@env";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   StyleSheet,
   Text,
@@ -99,6 +100,7 @@ export default function CreateMeeting() {
   const [date, setDate] = useState(new Date());
   const [timePeriod, setTimePeriod] = useState("AM");
   const [selectedDate, setSelectedDate] = useState(null);
+  const [completeTime, setCompleteTime] = useState([]);
   const [selectedDateTime, setSelectedDateTime] = useState([]);
 
   const { currentUser } = useSelector((state) => state);
@@ -114,7 +116,7 @@ export default function CreateMeeting() {
       text: "미팅일정등록이 완료 되었습니다.",
     });
     try {
-      await axios.patch(`http://localhost:8000/api/users/${currentUser.id}`, {
+      await axios.patch(`${LOGIN_API_URL}/api/users/${currentUser.id}`, {
         selectedDateTime,
       });
     } catch (error) {
@@ -170,6 +172,18 @@ export default function CreateMeeting() {
     },
   });
 
+  const isCompleteTime = (day, hour) => {
+    return completeTime.some((dateTime) => {
+      const complete = new Date(dateTime);
+      return (
+        complete.getDate() === day.getDate() &&
+        complete.getMonth() === day.getMonth() &&
+        complete.getFullYear() === day.getFullYear() &&
+        complete.getHours() === hour
+      );
+    });
+  };
+
   const animatedStyle = useAnimatedStyle(() => {
     return {
       transform: [{ translateX: translateX.value }],
@@ -177,16 +191,20 @@ export default function CreateMeeting() {
     };
   });
 
-  useEffect(() => {
-    async function fetchData() {
-      const response = await axios.get(
-        `http://localhost:8000/api/users/${currentUser.id}`,
-      );
-      const openTime = response.data.openTime || null;
-      setSelectedDateTime(openTime);
-    }
-    fetchData();
-  }, [currentUser.id]);
+  useFocusEffect(
+    useCallback(() => {
+      async function fetchData() {
+        const response = await axios.get(
+          `${LOGIN_API_URL}/api/users/${currentUser.id}`,
+        );
+        const openTime = response.data.openTime || null;
+        const reservationTime = response.data.reservationTime || null;
+        setCompleteTime(reservationTime);
+        setSelectedDateTime(openTime);
+      }
+      fetchData();
+    }, [currentUser.id]),
+  );
 
   return (
     <ScrollView style={styles.scrollContainer}>
@@ -261,16 +279,25 @@ export default function CreateMeeting() {
                 );
               });
 
+              const isDisabled = isCompleteTime(selectedDate, hour);
+
               return (
                 <TouchableOpacity
                   key={`hour-${index}`}
-                  style={[styles.hour, isSelected && styles.selectedHour]}
-                  onPress={() => onHourSelect(selectedDate, hour)}
+                  style={[
+                    styles.hour,
+                    isSelected && styles.selectedHour,
+                    isDisabled && styles.disabledHour,
+                  ]}
+                  onPress={() =>
+                    !isDisabled && onHourSelect(selectedDate, hour)
+                  }
                 >
                   <Text
                     style={[
                       styles.hourText,
                       isSelected && styles.selectedHourText,
+                      isDisabled && styles.disabledHourText,
                     ]}
                   >
                     {`${hour}:00`}
@@ -455,5 +482,11 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 25,
     fontWeight: "bold",
+  },
+  disabledHour: {
+    backgroundColor: "orange",
+  },
+  disabledHourText: {
+    color: "#FFF",
   },
 });

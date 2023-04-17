@@ -1,5 +1,7 @@
-import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
+import { LOGIN_API_URL } from "@env";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import axios from "axios";
+import React, { useState, useCallback } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,131 +11,38 @@ import {
   Image,
   TextInput,
 } from "react-native";
-
-const mockData = [
-  {
-    requester: {
-      name: "호랑이",
-      imgURL:
-        "https://lh3.googleusercontent.com/a/AGNmyxa5mqAs837yjRYEkSvflqIJV3vnOFxU3yjyTpd_=s96-c",
-    },
-    requestee: {
-      name: "이상혁",
-      imgURL:
-        "https://lh3.googleusercontent.com/a/AGNmyxa5mqAs837yjRYEkSvflqIJV3vnOFxU3yjyTpd_=s96-c",
-    },
-    status: "pending",
-    location: "zoom",
-    Date: "2023.12.15",
-    startTime: "14",
-    title: "호랑이랑 사자랑 싸우면 누가이겨?",
-    message: "",
-  },
-  {
-    requester: {
-      name: "원숭이",
-      imgURL:
-        "https://lh3.googleusercontent.com/a/AGNmyxa5mqAs837yjRYEkSvflqIJV3vnOFxU3yjyTpd_=s96-c",
-    },
-    requestee: {
-      name: "이상혁",
-      imgURL:
-        "https://lh3.googleusercontent.com/a/AGNmyxa5mqAs837yjRYEkSvflqIJV3vnOFxU3yjyTpd_=s96-c",
-    },
-    status: "pending",
-    location: "zoom",
-    Date: "2023.12.15",
-    startTime: "09",
-    title: "엉덩이 빨간생 이니?",
-    message: "",
-  },
-  {
-    requester: {
-      name: "이상혁",
-      imgURL:
-        "https://lh3.googleusercontent.com/a/AGNmyxa5mqAs837yjRYEkSvflqIJV3vnOFxU3yjyTpd_=s96-c",
-    },
-    requestee: {
-      name: "???",
-      imgURL:
-        "https://lh3.googleusercontent.com/a/AGNmyxa5mqAs837yjRYEkSvflqIJV3vnOFxU3yjyTpd_=s96-c",
-    },
-    status: "pending",
-    location: "zoom",
-    Date: "2023.12.15",
-    startTime: "09",
-    title: "누굴까요?",
-    message: "",
-  },
-  {
-    requester: {
-      name: "이상혁",
-      imgURL:
-        "https://lh3.googleusercontent.com/a/AGNmyxa5mqAs837yjRYEkSvflqIJV3vnOFxU3yjyTpd_=s96-c",
-    },
-    requestee: {
-      name: "땅콩이",
-      imgURL:
-        "https://lh3.googleusercontent.com/a/AGNmyxa5mqAs837yjRYEkSvflqIJV3vnOFxU3yjyTpd_=s96-c",
-    },
-    status: "pending",
-    location: "zoom",
-    Date: "2023.12.15",
-    startTime: "09",
-    title: "미팅신청 합니다.",
-    message: "",
-  },
-  {
-    requester: {
-      name: "얼룩말",
-      imgURL:
-        "https://lh3.googleusercontent.com/a/AGNmyxa5mqAs837yjRYEkSvflqIJV3vnOFxU3yjyTpd_=s96-c",
-    },
-    requestee: {
-      name: "이상혁",
-      imgURL:
-        "https://lh3.googleusercontent.com/a/AGNmyxa5mqAs837yjRYEkSvflqIJV3vnOFxU3yjyTpd_=s96-c",
-    },
-    status: "rejected",
-    location: "zoom",
-    Date: "2023.12.15",
-    startTime: "11",
-    title: "말이 더빠름",
-    message: "내가 더빠른데..",
-  },
-  {
-    requester: {
-      name: "돼지",
-      imgURL:
-        "https://lh3.googleusercontent.com/a/AGNmyxa5mqAs837yjRYEkSvflqIJV3vnOFxU3yjyTpd_=s96-c",
-    },
-    requestee: {
-      name: "이상혁",
-      imgURL:
-        "https://lh3.googleusercontent.com/a/AGNmyxa5mqAs837yjRYEkSvflqIJV3vnOFxU3yjyTpd_=s96-c",
-    },
-    status: "rejected",
-    location: "zoom",
-    Date: "2023.12.15",
-    startTime: "11",
-    title: "맛나겠다",
-    message: "소가 더맛날듯..",
-  },
-];
+import { useSelector } from "react-redux";
 
 export default function MeetingInfo() {
   const [activeButton, setActiveButton] = useState(0);
   const [expandedCards, setExpandedCards] = useState([]);
+  const [meetingList, setMeetingList] = useState([]);
+  const [inputRejected, setInputRejected] = useState("");
 
   const navigation = useNavigation();
+
+  const { currentUser } = useSelector((state) => state);
+
+  const fetchData = useCallback(async () => {
+    const response = await axios.get(
+      `${LOGIN_API_URL}/api/users/${currentUser.id}/meetings`,
+    );
+    const meetings = response.data;
+    return meetings;
+  }, [currentUser.id]);
+
+  const handleButtonClick = async () => {
+    const updatedData = await fetchData();
+    setMeetingList(updatedData);
+  };
 
   const handleMeetingRequest = () => {
     navigation.navigate("MeetingRequest");
   };
 
-  const handlePress = (index) => {
+  const handlePress = async (index) => {
     setActiveButton(index);
-    setExpandedCards(mockData.map(() => false));
+    setExpandedCards(meetingList.map(() => false));
   };
 
   const toggleCardExpansion = (index) => {
@@ -146,14 +55,108 @@ export default function MeetingInfo() {
     }
   };
 
+  const handleAccept = async (id) => {
+    const patchResponse = await axios.patch(
+      `${LOGIN_API_URL}/api/meetings/${id}/accept`,
+    );
+
+    if (patchResponse.status === 200) {
+      handleButtonClick();
+    }
+  };
+
+  const handleCancel = async (userId, meetingId, time) => {
+    try {
+      const patchResponse = await axios.patch(
+        `${LOGIN_API_URL}/api/users/${userId}/cancel`,
+        {
+          time,
+        },
+      );
+
+      if (patchResponse.status === 200) {
+        await axios.delete(`${LOGIN_API_URL}/api/meetings/${meetingId}`);
+        handleButtonClick();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleRejected = async (userId, meetingId, time) => {
+    try {
+      const patchResponse = await axios.patch(
+        `${LOGIN_API_URL}/api/users/${userId}/cancel`,
+        {
+          time,
+        },
+      );
+
+      if (patchResponse.status === 200) {
+        const patchResponse = await axios.patch(
+          `${LOGIN_API_URL}/api/meetings/${meetingId}/rejected`,
+          {
+            message: inputRejected,
+          },
+        );
+
+        if (patchResponse.status === 200) {
+          handleButtonClick();
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const completeMeeting = async (id, meetingId, time) => {
+    try {
+      const patchResponse = await axios.patch(
+        `${LOGIN_API_URL}/api/users/${id}/changeReservationTime`,
+        {
+          time,
+        },
+      );
+
+      if (patchResponse.status === 200) {
+        await axios.delete(`${LOGIN_API_URL}/api/meetings/${meetingId}`);
+        handleButtonClick();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleDelete = async (meetingId) => {
+    try {
+      await axios.delete(`${LOGIN_API_URL}/api/meetings/${meetingId}`);
+      handleButtonClick();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      async function fetchData() {
+        const response = await axios.get(
+          `${LOGIN_API_URL}/api/users/${currentUser.id}/meetings`,
+        );
+        const meetings = response.data;
+        setMeetingList(meetings);
+      }
+      fetchData();
+    }, []),
+  );
+
   const filterMeetings = (status, isRequester) => {
-    const filteredMeeting = mockData.filter(
+    const filteredMeeting = meetingList.filter(
       (meeting) =>
         meeting.status === status &&
         (isRequester
-          ? meeting.requester.name === "이상혁"
-          : meeting.requestee.name === "이상혁" &&
-            meeting.requester.name !== "이상혁"),
+          ? meeting.requester.name === currentUser.name
+          : meeting.requestee.name === currentUser.name &&
+            meeting.requester.name !== currentUser.name),
     );
 
     if (filteredMeeting.length === 0) {
@@ -162,11 +165,16 @@ export default function MeetingInfo() {
 
     return filteredMeeting.map((meeting, index) => (
       <View
-        key={meeting.title}
+        key={meeting._id}
         style={[
           styles.meetingCard,
           expandedCards.includes(index) && {
-            height: activeButton === 2 || activeButton === 3 ? 370 : 230,
+            height:
+              activeButton === 0 || activeButton === 1
+                ? 290
+                : activeButton === 2 || activeButton === 3
+                ? 370
+                : 230,
           },
         ]}
         onStartShouldSetResponder={() => true}
@@ -177,8 +185,8 @@ export default function MeetingInfo() {
             <Image
               source={{
                 uri: isRequester
-                  ? meeting.requestee.imgURL
-                  : meeting.requester.imgURL,
+                  ? meeting.requestee.picture
+                  : meeting.requester.picture,
               }}
               style={styles.profileImg}
             />
@@ -186,8 +194,11 @@ export default function MeetingInfo() {
           <Text style={styles.cardName}>
             {isRequester ? meeting.requestee.name : meeting.requester.name}
           </Text>
-          <Text style={styles.cardText}>{meeting.Date}</Text>
-          <Text style={styles.cardText}>{`${meeting.startTime}시`}</Text>
+          <Text style={styles.cardText}>
+            {new Date(meeting.startTime).toLocaleString()[20] === "0"
+              ? new Date(meeting.startTime).toLocaleString().slice(0, 21)
+              : new Date(meeting.startTime).toLocaleString().slice(0, 20)}
+          </Text>
         </View>
         {expandedCards.includes(index) && (
           <View style={{ flexDirection: "column" }}>
@@ -199,24 +210,71 @@ export default function MeetingInfo() {
               <Text style={styles.cardText}>미팅주소</Text>
               <Text style={styles.cardText}>{meeting.location}</Text>
             </View>
+            {activeButton === 0 && (
+              <>
+                <View style={styles.meetingButtonContainer}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      handleCancel(
+                        meeting.requester.id,
+                        meeting._id,
+                        meeting.startTime,
+                      )
+                    }
+                  >
+                    <View style={styles.meetingButton}>
+                      <Text style={styles.cardText}>취소</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+            {activeButton === 1 && (
+              <>
+                <View style={styles.meetingButtonContainer}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      completeMeeting(
+                        meeting.requester.id,
+                        meeting._id,
+                        meeting.startTime,
+                      )
+                    }
+                  >
+                    <View style={styles.meetingButton}>
+                      <Text style={styles.cardText}>미팅완료</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
             {activeButton === 2 && (
               <>
                 <View style={styles.meetingContentContainer}>
                   <Text style={styles.cardText}>거절사유</Text>
                   <TextInput
                     style={styles.contentInput}
+                    onChangeText={setInputRejected}
                     placeholder="거절사유를 입력해주세요"
                   />
                 </View>
                 <View style={styles.meetingButtonContainer}>
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleAccept(meeting._id)}>
                     <View style={styles.meetingButton}>
                       <Text style={styles.cardText}>수락</Text>
                     </View>
                   </TouchableOpacity>
-                  <TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() =>
+                      handleRejected(
+                        meeting.requester.id,
+                        meeting._id,
+                        meeting.startTime,
+                      )
+                    }
+                  >
                     <View style={styles.meetingButton}>
-                      <Text style={styles.cardText}>삭제</Text>
+                      <Text style={styles.cardText}>거절</Text>
                     </View>
                   </TouchableOpacity>
                 </View>
@@ -234,9 +292,9 @@ export default function MeetingInfo() {
                       <Text style={styles.cardText}>수정</Text>
                     </View>
                   </TouchableOpacity>
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleDelete(meeting._id)}>
                     <View style={styles.meetingButton}>
-                      <Text style={styles.cardText}>거절</Text>
+                      <Text style={styles.cardText}>삭제</Text>
                     </View>
                   </TouchableOpacity>
                 </View>
@@ -329,7 +387,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "column",
     backgroundColor: "#FFD6F5",
-    width: 300,
+    width: 320,
     padding: 10,
     borderWidth: 2,
     borderRadius: 10,
@@ -346,7 +404,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginLeft: 5,
-    marginRight: 5,
   },
   cardText: {
     marginLeft: 5,

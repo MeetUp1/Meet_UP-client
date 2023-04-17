@@ -1,5 +1,7 @@
+import { LOGIN_API_URL } from "@env";
+import { useFocusEffect } from "@react-navigation/native";
 import axios from "axios";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
 import Animated, {
@@ -170,20 +172,22 @@ export default function RequestCalendar({
     return date.toISOString();
   };
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await axios.get(
-          `http://localhost:8000/api/users/${selectedUser.id}`,
-        );
-        const openTime = response.data.openTime || null;
-        setSelectUserTime(openTime);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
+  useFocusEffect(
+    useCallback(() => {
+      async function fetchData() {
+        try {
+          const response = await axios.get(
+            `${LOGIN_API_URL}/api/users/${selectedUser.id}`,
+          );
+          const openTime = response.data.openTime || null;
+          setSelectUserTime(openTime);
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
       }
-    }
-    fetchData();
-  }, [selectedUser.id]);
+      fetchData();
+    }, [selectedUser.id]),
+  );
 
   return (
     <View>
