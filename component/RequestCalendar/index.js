@@ -118,6 +118,7 @@ export default function RequestCalendar({
   nextStep,
   selectedUser,
   setSelectUserUTCTime,
+  prevStep,
 }) {
   const [date, setDate] = useState(new Date());
   const [timePeriod, setTimePeriod] = useState("AM");
@@ -249,7 +250,7 @@ export default function RequestCalendar({
         }
       }
       fetchData();
-    }, [selectedUser.id]),
+    }, []),
   );
 
   return (
@@ -343,16 +344,26 @@ export default function RequestCalendar({
             );
           })}
       </View>
-      {selectedHours.length !== 0 && (
+      <View style={styles.buttonContainer}>
         <View style={styles.container}>
           <TouchableOpacity
             style={styles.nextButton}
-            onPress={() => nextStep()}
+            onPress={() => prevStep()}
           >
-            <Text style={styles.nextButtonText}>다음</Text>
+            <Text style={styles.nextButtonText}>뒤로</Text>
           </TouchableOpacity>
         </View>
-      )}
+        {selectedHours.length !== 0 && (
+          <View style={styles.container}>
+            <TouchableOpacity
+              style={styles.nextButton}
+              onPress={() => nextStep()}
+            >
+              <Text style={styles.nextButtonText}>다음</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
     </View>
   );
 }
@@ -361,7 +372,14 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#fff",
     alignItems: "center",
-    marginTop: 20,
+    marginTop: 10,
+  },
+  buttonContainer: {
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10,
+    flexDirection: "row",
   },
   marginContainer: {
     marginBottom: 50,
@@ -500,8 +518,10 @@ const styles = StyleSheet.create({
   nextButton: {
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 10,
+    marginTop: 5,
     marginBottom: 50,
+    marginLeft: 10,
+    marginRight: 10,
     width: 100,
     height: 50,
     borderRadius: 15,

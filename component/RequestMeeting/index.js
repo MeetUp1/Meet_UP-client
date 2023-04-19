@@ -16,19 +16,27 @@ import { useSelector } from "react-redux";
 
 import RequestCalendar from "../RequestCalendar";
 
-export default function MeetingRequest() {
-  const [searchUser, setSearchUser] = useState("");
-  const [foundUsers, setFoundUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState({});
+export default function MeetingRequest({ route }) {
+  const [step, setStep] = useState(route.params ? route.params.initialStep : 1);
+  const [searchUser, setSearchUser] = useState(
+    route.params ? route.params.userinfo.name : "",
+  );
+  const [foundUsers, setFoundUsers] = useState(
+    route.params ? [route.params.userinfo] : [],
+  );
+  const [selectedUser, setSelectedUser] = useState(
+    route.params ? route.params.userinfo : {},
+  );
   const [content, setContent] = useState("");
   const [address, setAddress] = useState("");
   const [userList, setUserList] = useState([]);
-  const [step, setStep] = useState(1);
   const [selectUserUTCTime, setSelectUserUTCTime] = useState("");
 
   const { currentUser } = useSelector((state) => state);
 
-  const stepAnimation = useRef(new Animated.Value(0)).current;
+  const stepAnimation = useRef(
+    new Animated.Value(route.params ? route.params.initialStep - 1 : 0),
+  ).current;
 
   const navigation = useNavigation();
 
@@ -42,7 +50,7 @@ export default function MeetingRequest() {
     setFoundUsers([]);
     setSelectedUser({});
     setStep(1);
-    stepAnimation.setValue(0);
+    stepAnimation.setValue(route.params ? route.params.initialStep - 1 : 0);
   };
 
   const inputContent = (text) => {
@@ -84,6 +92,32 @@ export default function MeetingRequest() {
       duration: 800,
       useNativeDriver: true,
     }).start();
+  };
+
+  const prevStep = () => {
+    if (step <= 1) return;
+
+    if (step === 2) {
+      setSearchUser("");
+      setFoundUsers([]);
+      setSelectedUser({});
+
+      Animated.timing(stepAnimation, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }).start(() => {
+        setStep(step - 1);
+      });
+    } else if (step === 3) {
+      setSelectUserUTCTime("");
+
+      Animated.timing(stepAnimation, {
+        toValue: step - 2,
+        duration: 800,
+        useNativeDriver: true,
+      }).start(setStep(step - 1));
+    }
   };
 
   const handleChangeSchedule = async () => {
@@ -183,7 +217,7 @@ export default function MeetingRequest() {
               {
                 translateY: stepAnimation.interpolate({
                   inputRange: [0, 1],
-                  outputRange: [600, 0],
+                  outputRange: [900, 0],
                 }),
               },
             ],
@@ -201,6 +235,7 @@ export default function MeetingRequest() {
                 nextStep={nextStep}
                 selectedUser={selectedUser}
                 setSelectUserUTCTime={setSelectUserUTCTime}
+                prevStep={prevStep}
               />
             </View>
           )}
@@ -253,14 +288,22 @@ export default function MeetingRequest() {
                     />
                   </View>
                 </View>
-                {content && (
+                <View style={styles.buttonContainer}>
                   <TouchableOpacity
                     style={styles.nextButton}
-                    onPress={handleChangeSchedule}
+                    onPress={prevStep}
                   >
-                    <Text style={styles.nextButtonText}>완료</Text>
+                    <Text style={styles.nextButtonText}>뒤로</Text>
                   </TouchableOpacity>
-                )}
+                  {content && (
+                    <TouchableOpacity
+                      style={styles.nextButton}
+                      onPress={handleChangeSchedule}
+                    >
+                      <Text style={styles.nextButtonText}>완료</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
               </View>
             </Animated.View>
           </View>
@@ -280,6 +323,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 20,
     backgroundColor: "#fff",
+  },
+  buttonContainer: {
+    marginTop: 10,
+    flexDirection: "row",
   },
   stepContainer: {
     flexDirection: "row",

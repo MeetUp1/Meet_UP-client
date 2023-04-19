@@ -37,8 +37,16 @@ export default function MeetingInfo() {
     setMeetingList(updatedData);
   };
 
-  const handleMeetingRequest = () => {
-    navigation.navigate("MeetingRequest");
+  const handleMeetingRequest = async (userId) => {
+    try {
+      const response = await axios.get(`${LOGIN_API_URL}/api/users/${userId}`);
+      navigation.navigate("MeetingRequest", {
+        initialStep: 2,
+        userinfo: response.data,
+      });
+    } catch (error) {
+      //에러 페이지
+    }
   };
 
   const handlePress = async (index) => {
@@ -292,7 +300,9 @@ export default function MeetingInfo() {
                   <Text style={styles.cardText}>{meeting.message}</Text>
                 </View>
                 <View style={styles.meetingButtonContainer}>
-                  <TouchableOpacity onPress={handleMeetingRequest}>
+                  <TouchableOpacity
+                    onPress={() => handleMeetingRequest(meeting.requester.id)}
+                  >
                     <View style={styles.meetingButton}>
                       <Text style={styles.cardText}>수정</Text>
                     </View>
