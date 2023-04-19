@@ -1,7 +1,7 @@
 import { LOGIN_API_URL } from "@env";
 import { useFocusEffect } from "@react-navigation/native";
 import axios from "axios";
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
 import Animated, {
@@ -32,7 +32,13 @@ const CalendarHeader = ({ month, year, onPrev, onNext }) => (
   </View>
 );
 
-const MonthView = ({ month, year, selectedDate, setSelectedDate }) => {
+const MonthView = ({
+  month,
+  year,
+  selectedDate,
+  setSelectedDate,
+  selectUserTime,
+}) => {
   const daysInMonth = getDaysInMonth(month, year);
   const firstDayInMonth = getFirstDayInMonth(month, year);
 
@@ -42,6 +48,17 @@ const MonthView = ({ month, year, selectedDate, setSelectedDate }) => {
 
   const onDayPress = (day) => {
     setSelectedDate(day);
+  };
+
+  const getMeetingCountForDate = (date) => {
+    return selectUserTime
+      .map((time) => new Date(time))
+      .filter(
+        (time) =>
+          time.getFullYear() === date.getFullYear() &&
+          time.getMonth() === date.getMonth() &&
+          time.getDate() === date.getDate(),
+      ).length;
   };
 
   return (
@@ -63,7 +80,10 @@ const MonthView = ({ month, year, selectedDate, setSelectedDate }) => {
           .fill(null)
           .map((_, index) => {
             const day = new Date(year, month, index + 1);
-            const isToday = day.getTime() === today.getTime();
+            const isToday =
+              day.getFullYear() === today.getFullYear() &&
+              day.getMonth() === today.getMonth() &&
+              day.getDate() === today.getDate();
             const isSelected =
               selectedDate && day.getTime() === selectedDate.getTime();
 
@@ -74,6 +94,8 @@ const MonthView = ({ month, year, selectedDate, setSelectedDate }) => {
             ];
             const dayTextStyle = isToday ? styles.todayText : styles.dayText;
 
+            const meetingCount = getMeetingCountForDate(day);
+
             return (
               <TouchableOpacity
                 key={`day-${index}`}
@@ -81,6 +103,9 @@ const MonthView = ({ month, year, selectedDate, setSelectedDate }) => {
                 onPress={() => onDayPress(day)}
               >
                 <Text style={dayTextStyle}>{index + 1}</Text>
+                {meetingCount > 0 && (
+                  <Text style={styles.meetingCount}>{meetingCount}</Text>
+                )}
               </TouchableOpacity>
             );
           })}
@@ -98,17 +123,49 @@ export default function RequestCalendar({
   const [timePeriod, setTimePeriod] = useState("AM");
   const [selectedHours, setSelectedHours] = useState([]);
   const [selectUserTime, setSelectUserTime] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today;
+  });
 
   const month = date.getMonth();
   const year = date.getFullYear();
 
   const onPrevMonth = () => {
-    runOnJS(setDate)(new Date(year, month - 1, 1));
+    const newDate = new Date(year, month - 1, 1);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    runOnJS(setDate)(newDate);
+
+    if (
+      today.getMonth() === newDate.getMonth() &&
+      today.getFullYear() === newDate.getFullYear()
+    ) {
+      runOnJS(setSelectedDate)(today);
+    } else {
+      newDate.setHours(0, 0, 0, 0);
+      runOnJS(setSelectedDate)(newDate);
+    }
   };
 
   const onNextMonth = () => {
-    runOnJS(setDate)(new Date(year, month + 1, 1));
+    const newDate = new Date(year, month + 1, 1);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    runOnJS(setDate)(newDate);
+
+    if (
+      today.getMonth() === newDate.getMonth() &&
+      today.getFullYear() === newDate.getFullYear()
+    ) {
+      runOnJS(setSelectedDate)(today);
+    } else {
+      newDate.setHours(0, 0, 0, 0);
+      runOnJS(setSelectedDate)(newDate);
+    }
   };
 
   const onTimePeriodChange = (period) => {
@@ -116,9 +173,15 @@ export default function RequestCalendar({
   };
 
   const onHourSelect = (hour) => {
-    const utcDate = convertToUTCDate(selectedDate, hour);
-    setSelectUserUTCTime(utcDate);
-    setSelectedHours([hour]);
+    if (selectedHours.includes(hour)) {
+      setSelectedHours(
+        selectedHours.filter((selectedHour) => selectedHour !== hour),
+      );
+    } else {
+      const utcDate = convertToUTCDate(selectedDate, hour);
+      setSelectUserUTCTime(utcDate);
+      setSelectedHours([hour]);
+    }
   };
 
   const translateX = useSharedValue(0);
@@ -190,7 +253,7 @@ export default function RequestCalendar({
   );
 
   return (
-    <View>
+    <View style={styles.marginContainer}>
       <View style={styles.container}>
         <CalendarHeader
           month={month}
@@ -206,6 +269,7 @@ export default function RequestCalendar({
                 year={year}
                 selectedDate={selectedDate}
                 setSelectedDate={setSelectedDate}
+                selectUserTime={selectUserTime}
               />
             </View>
           </Animated.View>
@@ -279,11 +343,16 @@ export default function RequestCalendar({
             );
           })}
       </View>
-      <View style={styles.container}>
-        <TouchableOpacity style={styles.nextButton} onPress={() => nextStep()}>
-          <Text style={styles.nextButtonText}>다음</Text>
-        </TouchableOpacity>
-      </View>
+      {selectedHours.length !== 0 && (
+        <View style={styles.container}>
+          <TouchableOpacity
+            style={styles.nextButton}
+            onPress={() => nextStep()}
+          >
+            <Text style={styles.nextButtonText}>다음</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }
@@ -293,6 +362,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     marginTop: 20,
+  },
+  marginContainer: {
+    marginBottom: 50,
   },
   header: {
     flexDirection: "row",
@@ -452,5 +524,16 @@ const styles = StyleSheet.create({
   },
   unavailableHourText: {
     color: "#999",
+  },
+  meetingCount: {
+    position: "absolute",
+    bottom: 1,
+    right: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    borderRadius: 30,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    color: "white",
+    fontSize: 10,
   },
 });

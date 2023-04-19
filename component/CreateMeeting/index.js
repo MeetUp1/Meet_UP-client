@@ -99,9 +99,13 @@ const MonthView = ({ month, year, selectedDate, setSelectedDate }) => {
 export default function CreateMeeting() {
   const [date, setDate] = useState(new Date());
   const [timePeriod, setTimePeriod] = useState("AM");
-  const [selectedDate, setSelectedDate] = useState(null);
   const [completeTime, setCompleteTime] = useState([]);
   const [selectedDateTime, setSelectedDateTime] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today;
+  });
 
   const { currentUser } = useSelector((state) => state);
 
@@ -125,13 +129,39 @@ export default function CreateMeeting() {
   };
 
   const onPrevMonth = () => {
-    runOnJS(setDate)(new Date(year, month - 1, 1));
-    runOnJS(setSelectedDate)(new Date(year, month - 1, 1));
+    const newDate = new Date(year, month - 1, 1);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    runOnJS(setDate)(newDate);
+
+    if (
+      today.getMonth() === newDate.getMonth() &&
+      today.getFullYear() === newDate.getFullYear()
+    ) {
+      runOnJS(setSelectedDate)(today);
+    } else {
+      newDate.setHours(0, 0, 0, 0);
+      runOnJS(setSelectedDate)(newDate);
+    }
   };
 
   const onNextMonth = () => {
-    runOnJS(setDate)(new Date(year, month + 1, 1));
-    runOnJS(setSelectedDate)(new Date(year, month + 1, 1));
+    const newDate = new Date(year, month + 1, 1);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    runOnJS(setDate)(newDate);
+
+    if (
+      today.getMonth() === newDate.getMonth() &&
+      today.getFullYear() === newDate.getFullYear()
+    ) {
+      runOnJS(setSelectedDate)(today);
+    } else {
+      newDate.setHours(0, 0, 0, 0);
+      runOnJS(setSelectedDate)(newDate);
+    }
   };
 
   const onTimePeriodChange = (period) => {
@@ -229,40 +259,43 @@ export default function CreateMeeting() {
           </Animated.View>
         </PanGestureHandler>
       </View>
-      <View style={styles.timePeriodContainer}>
-        <TouchableOpacity
-          style={[
-            styles.timePeriodButton,
-            timePeriod === "AM" && styles.timePeriodSelected,
-          ]}
-          onPress={() => onTimePeriodChange("AM")}
-        >
-          <Text
+      {selectedDate && (
+        <View style={styles.timePeriodContainer}>
+          <TouchableOpacity
             style={[
-              styles.timePeriodText,
-              timePeriod === "AM" && styles.timePeriodSelectedText,
+              styles.timePeriodButton,
+              timePeriod === "AM" && styles.timePeriodSelected,
             ]}
+            onPress={() => onTimePeriodChange("AM")}
           >
-            오전
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.timePeriodButton,
-            timePeriod === "PM" && styles.timePeriodSelected,
-          ]}
-          onPress={() => onTimePeriodChange("PM")}
-        >
-          <Text
+            <Text
+              style={[
+                styles.timePeriodText,
+                timePeriod === "AM" && styles.timePeriodSelectedText,
+              ]}
+            >
+              오전
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             style={[
-              styles.timePeriodText,
-              timePeriod === "PM" && styles.timePeriodSelectedText,
+              styles.timePeriodButton,
+              timePeriod === "PM" && styles.timePeriodSelected,
             ]}
+            onPress={() => onTimePeriodChange("PM")}
           >
-            오후
-          </Text>
-        </TouchableOpacity>
-      </View>
+            <Text
+              style={[
+                styles.timePeriodText,
+                timePeriod === "PM" && styles.timePeriodSelectedText,
+              ]}
+            >
+              오후
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
       <View style={styles.hoursContainer}>
         {selectedDate &&
           Array(12)
@@ -306,11 +339,16 @@ export default function CreateMeeting() {
               );
             })}
       </View>
-      <View style={styles.container}>
-        <TouchableOpacity style={styles.button} onPress={handleMeetingSchedule}>
-          <Text style={styles.buttonText}>시간등록</Text>
-        </TouchableOpacity>
-      </View>
+      {selectedDate && (
+        <View style={styles.container}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleMeetingSchedule}
+          >
+            <Text style={styles.buttonText}>시간등록</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </ScrollView>
   );
 }

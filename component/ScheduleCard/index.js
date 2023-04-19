@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 
-const ScheduleCard = ({ name, time, agenda, address }) => {
+const ScheduleCard = ({ name, time, agenda, address, picture }) => {
   const [expanded, setExpanded] = useState(false);
 
   const toggleExpanded = () => {
@@ -10,12 +10,23 @@ const ScheduleCard = ({ name, time, agenda, address }) => {
 
   return (
     <TouchableOpacity onPress={toggleExpanded} style={styles.card}>
-      <Text style={styles.cardTitle}>{name}</Text>
-      <Text style={styles.cardTime}>{time}</Text>
+      <View style={styles.scheduleCardRow}>
+        <View style={styles.profileImgContainer}>
+          <Image source={{ uri: picture }} style={styles.profileImg} />
+        </View>
+        <Text style={styles.cardTitle}>{name}</Text>
+        <Text style={styles.cardTime}>{time}</Text>
+      </View>
       {expanded && (
         <View style={styles.cardDetails}>
-          <Text style={styles.cardAgenda}>미팅안건: {agenda}</Text>
-          <Text style={styles.cardAddress}>미팅주소: {address}</Text>
+          <View style={styles.subtitleContainer}>
+            <Text style={styles.subtitleTitle}>미팅안건</Text>
+            <Text style={styles.subtitleContent}>{agenda}</Text>
+          </View>
+          <View style={styles.subtitleContainer}>
+            <Text style={styles.subtitleTitle}>미팅주소</Text>
+            <Text style={styles.subtitleContent}>{address}</Text>
+          </View>
         </View>
       )}
     </TouchableOpacity>
@@ -30,24 +41,51 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     padding: 15,
     width: "80%",
+    borderWidth: 2,
   },
   cardTitle: {
-    fontSize: 18,
+    marginRight: 5,
+    fontSize: 20,
     fontWeight: "bold",
   },
   cardTime: {
-    fontSize: 16,
-    marginTop: 5,
+    fontSize: 18,
   },
   cardDetails: {
     marginTop: 10,
   },
-  cardAgenda: {
-    fontSize: 14,
+  subtitleTitle: {
+    fontSize: 17,
     marginBottom: 5,
+    fontWeight: "bold",
   },
-  cardAddress: {
-    fontSize: 14,
+  subtitleContainer: {
+    backgroundColor: "#f8f8f8",
+    borderRadius: 10,
+    marginTop: 5,
+    marginBottom: 10,
+    padding: 10,
+    width: "100%",
+    borderWidth: 2,
+  },
+  subtitleContent: {
+    fontSize: 15,
+  },
+  profileImgContainer: {
+    width: 50,
+    height: 50,
+    marginRight: 5,
+    borderRadius: 50,
+    overflow: "hidden",
+  },
+  profileImg: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  scheduleCardRow: {
+    alignItems: "center",
+    flexDirection: "row",
   },
 });
 

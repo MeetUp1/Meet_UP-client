@@ -47,7 +47,7 @@ export default function Login() {
       const user = await response.json();
       if (user) {
         dispatch(userLogin(user));
-        navigation.navigate("CreateMeeting");
+        navigation.navigate("MeetingSchedule");
         await axios.post(`${LOGIN_API_URL}/api/users/login`, {
           user,
         });

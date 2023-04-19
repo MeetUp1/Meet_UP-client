@@ -10,6 +10,7 @@ import {
   ScrollView,
   Image,
   TextInput,
+  Alert,
 } from "react-native";
 import { useSelector } from "react-redux";
 
@@ -84,6 +85,10 @@ export default function MeetingInfo() {
   };
 
   const handleRejected = async (userId, meetingId, time) => {
+    if (inputRejected.length === 0) {
+      Alert.alert("Error", "거절 사유를 입력해주세요.");
+      return;
+    }
     try {
       const patchResponse = await axios.patch(
         `${LOGIN_API_URL}/api/users/${userId}/cancel`,
@@ -204,11 +209,11 @@ export default function MeetingInfo() {
           <View style={{ flexDirection: "column" }}>
             <View style={styles.meetingContentContainer}>
               <Text style={styles.cardText}>미팅주제</Text>
-              <Text style={styles.cardText}>{meeting.title}</Text>
+              <Text style={styles.inputText}>{meeting.title}</Text>
             </View>
             <View style={styles.meetingContentContainer}>
               <Text style={styles.cardText}>미팅주소</Text>
-              <Text style={styles.cardText}>{meeting.location}</Text>
+              <Text style={styles.inputText}>{meeting.location}</Text>
             </View>
             {activeButton === 0 && (
               <>
@@ -430,7 +435,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#FFD6F5",
     marginTop: 5,
-    width: 250,
+    width: 300,
     height: 70,
     padding: 3,
     borderWidth: 2,
@@ -468,7 +473,13 @@ const styles = StyleSheet.create({
     marginTop: 5,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    width: 240,
+    width: 290,
     height: 30,
+  },
+  inputText: {
+    marginLeft: 5,
+    marginTop: 10,
+    fontSize: 17,
+    fontWeight: "bold",
   },
 });

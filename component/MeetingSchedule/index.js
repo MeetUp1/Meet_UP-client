@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { LOGIN_API_URL } from "@env";
+import { useFocusEffect } from "@react-navigation/native";
+import axios from "axios";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   StyleSheet,
   Text,
@@ -15,6 +18,7 @@ import Animated, {
   withSpring,
   runOnJS,
 } from "react-native-reanimated";
+import { useSelector } from "react-redux";
 
 import ScheduleCard from "../ScheduleCard";
 
@@ -38,11 +42,16 @@ const CalendarHeader = ({ month, year, onPrev, onNext }) => (
   </View>
 );
 
-const MonthView = ({ month, year }) => {
+const MonthView = ({
+  month,
+  year,
+  meetingsByDate,
+  onDaySelected,
+  selectedDate,
+  setSelectedDate,
+}) => {
   const daysInMonth = getDaysInMonth(month, year);
   const firstDayInMonth = getFirstDayInMonth(month, year);
-
-  const [selectedDate, setSelectedDate] = useState(null);
 
   const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
   const today = new Date();
@@ -50,6 +59,7 @@ const MonthView = ({ month, year }) => {
 
   const onDayPress = (day) => {
     setSelectedDate(day);
+    onDaySelected(day);
   };
 
   return (
@@ -71,9 +81,13 @@ const MonthView = ({ month, year }) => {
           .fill(null)
           .map((_, index) => {
             const day = new Date(year, month, index + 1);
+            const dayMeetings = meetingsByDate[index + 1] || [];
             const isToday = day.getTime() === today.getTime();
             const isSelected =
-              selectedDate && day.getTime() === selectedDate.getTime();
+              selectedDate &&
+              day.getFullYear() === selectedDate.getFullYear() &&
+              day.getMonth() === selectedDate.getMonth() &&
+              day.getDate() === selectedDate.getDate();
 
             const dayStyle = [
               styles.day,
@@ -89,6 +103,9 @@ const MonthView = ({ month, year }) => {
                 onPress={() => onDayPress(day)}
               >
                 <Text style={dayTextStyle}>{index + 1}</Text>
+                {dayMeetings.length > 0 && (
+                  <Text style={styles.meetingCount}>{dayMeetings.length}</Text>
+                )}
               </TouchableOpacity>
             );
           })}
@@ -100,15 +117,49 @@ const MonthView = ({ month, year }) => {
 export default function MeetingSchedule({ route }) {
   const [visibleSnackbar, setVisibleSnackbar] = useState(false);
   const [date, setDate] = useState(new Date());
+  const [meetingList, setMeetingList] = useState([]);
+  const [selectedDateMeetings, setSelectedDateMeetings] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
   const month = date.getMonth();
   const year = date.getFullYear();
 
+  const { currentUser } = useSelector((state) => state);
+
   const onPrevMonth = () => {
-    runOnJS(setDate)(new Date(year, month - 1, 1));
+    const newDate = new Date(year, month - 1, 1);
+    const today = new Date();
+
+    runOnJS(setDate)(newDate);
+
+    if (
+      today.getMonth() === newDate.getMonth() &&
+      today.getFullYear() === newDate.getFullYear()
+    ) {
+      runOnJS(setSelectedDate)(today);
+      runOnJS(onDaySelected)(today);
+    } else {
+      runOnJS(setSelectedDate)(newDate);
+      runOnJS(onDaySelected)(newDate);
+    }
   };
 
   const onNextMonth = () => {
-    runOnJS(setDate)(new Date(year, month + 1, 1));
+    const newDate = new Date(year, month + 1, 1);
+    const today = new Date();
+
+    runOnJS(setDate)(newDate);
+
+    if (
+      today.getMonth() === newDate.getMonth() &&
+      today.getFullYear() === newDate.getFullYear()
+    ) {
+      runOnJS(setSelectedDate)(today);
+      runOnJS(onDaySelected)(today);
+    } else {
+      runOnJS(setSelectedDate)(newDate);
+      runOnJS(onDaySelected)(newDate);
+    }
   };
 
   const translateX = useSharedValue(0);
@@ -141,11 +192,59 @@ export default function MeetingSchedule({ route }) {
     setVisibleSnackbar(false);
   };
 
+  const getMeetingsByDate = (meetingList, month, year) => {
+    const meetingsByDate = {};
+
+    meetingList.forEach((meeting) => {
+      const meetingDate = new Date(meeting.startTime);
+      if (
+        meetingDate.getMonth() === month &&
+        meetingDate.getFullYear() === year
+      ) {
+        const dateKey = meetingDate.getDate();
+        if (!meetingsByDate[dateKey]) {
+          meetingsByDate[dateKey] = [];
+        }
+        meetingsByDate[dateKey].push(meeting);
+      }
+    });
+
+    return meetingsByDate;
+  };
+
+  const onDaySelected = (selectedDate) => {
+    const selectedDateMeetings = meetingsByDate[selectedDate.getDate()] || [];
+    setSelectedDateMeetings(selectedDateMeetings);
+  };
+
+  const meetingsByDate = useMemo(
+    () => getMeetingsByDate(meetingList, month, year),
+    [meetingList, month, year],
+  );
+
   useEffect(() => {
     if (route.params && route.params.showSnackbar) {
       setVisibleSnackbar(true);
     }
   }, [route]);
+
+  useEffect(() => {
+    onDaySelected(selectedDate);
+  }, [meetingList, selectedDate]);
+
+  useFocusEffect(
+    useCallback(() => {
+      async function fetchData() {
+        const response = await axios.get(
+          `${LOGIN_API_URL}/api/users/${currentUser.id}/meetings/accepted`,
+        );
+        const meetings = response.data;
+        setMeetingList(meetings);
+        onDaySelected(selectedDate);
+      }
+      fetchData();
+    }, [selectedDate]),
+  );
 
   return (
     <>
@@ -160,46 +259,41 @@ export default function MeetingSchedule({ route }) {
           <PanGestureHandler onGestureEvent={onGestureEvent}>
             <Animated.View style={animatedStyle}>
               <View style={styles.monthWrapper}>
-                <MonthView month={month} year={year} />
+                <MonthView
+                  month={month}
+                  year={year}
+                  meetingsByDate={meetingsByDate}
+                  onDaySelected={onDaySelected}
+                  selectedDate={selectedDate}
+                  setSelectedDate={setSelectedDate}
+                />
               </View>
             </Animated.View>
           </PanGestureHandler>
-          <ScheduleCard
-            name="이상혁"
-            time="10:00 AM"
-            agenda="어쩌구저쩌구~~"
-            address="어쩌구저쩌구~~"
-          />
-          <ScheduleCard
-            name="이상혁"
-            time="10:00 AM"
-            agenda="어쩌구저쩌구~~"
-            address="어쩌구저쩌구~~"
-          />
-          <ScheduleCard
-            name="이상혁"
-            time="10:00 AM"
-            agenda="어쩌구저쩌구~~"
-            address="어쩌구저쩌구~~"
-          />
-          <ScheduleCard
-            name="이상혁"
-            time="10:00 AM"
-            agenda="어쩌구저쩌구~~"
-            address="어쩌구저쩌구~~"
-          />
-          <ScheduleCard
-            name="이상혁"
-            time="10:00 AM"
-            agenda="어쩌구저쩌구~~"
-            address="어쩌구저쩌구~~"
-          />
-          <ScheduleCard
-            name="이상혁"
-            time="10:00 AM"
-            agenda="어쩌구저쩌구~~"
-            address="어쩌구저쩌구~~"
-          />
+        </View>
+        <View style={styles.ScheduleCardContainer}>
+          {selectedDateMeetings.map((meeting, index) => (
+            <ScheduleCard
+              key={index}
+              name={
+                currentUser.name === meeting.requester.name
+                  ? meeting.requestee.name
+                  : `${meeting.requester.name}🤝`
+              }
+              time={
+                new Date(meeting.startTime).toLocaleString()[20] === "0"
+                  ? new Date(meeting.startTime).toLocaleString().slice(0, 21)
+                  : new Date(meeting.startTime).toLocaleString().slice(0, 20)
+              }
+              agenda={meeting.title}
+              address={meeting.location}
+              picture={
+                currentUser.name === meeting.requester.name
+                  ? meeting.requestee.picture
+                  : meeting.requester.picture
+              }
+            />
+          ))}
         </View>
       </ScrollView>
       <Snackbar
@@ -222,6 +316,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#fff",
     alignItems: "center",
+    marginBottom: 10,
   },
   header: {
     flexDirection: "row",
@@ -302,5 +397,20 @@ const styles = StyleSheet.create({
     bottom: 30,
     left: 0,
     right: 0,
+  },
+  meetingCount: {
+    position: "absolute",
+    bottom: 1,
+    right: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    borderRadius: 30,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    color: "white",
+    fontSize: 10,
+  },
+  ScheduleCardContainer: {
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

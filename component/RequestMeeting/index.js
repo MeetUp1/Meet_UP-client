@@ -169,7 +169,7 @@ export default function MeetingRequest() {
                 </TouchableOpacity>
               ))}
             </View>
-            {selectedUser && (
+            {Object.keys(selectedUser).length !== 0 && (
               <TouchableOpacity style={styles.nextButton} onPress={nextStep}>
                 <Text style={styles.nextButtonText}>다음</Text>
               </TouchableOpacity>
@@ -253,12 +253,14 @@ export default function MeetingRequest() {
                     />
                   </View>
                 </View>
-                <TouchableOpacity
-                  style={styles.nextButton}
-                  onPress={handleChangeSchedule}
-                >
-                  <Text style={styles.nextButtonText}>완료</Text>
-                </TouchableOpacity>
+                {content && (
+                  <TouchableOpacity
+                    style={styles.nextButton}
+                    onPress={handleChangeSchedule}
+                  >
+                    <Text style={styles.nextButtonText}>완료</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             </Animated.View>
           </View>
