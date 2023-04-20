@@ -120,6 +120,7 @@ export default function MeetingSchedule({ route }) {
   const [meetingList, setMeetingList] = useState([]);
   const [selectedDateMeetings, setSelectedDateMeetings] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [noSchedule, setNoSchedule] = useState(false);
 
   const month = date.getMonth();
   const year = date.getFullYear();
@@ -215,6 +216,12 @@ export default function MeetingSchedule({ route }) {
   const onDaySelected = (selectedDate) => {
     const selectedDateMeetings = meetingsByDate[selectedDate.getDate()] || [];
     setSelectedDateMeetings(selectedDateMeetings);
+
+    if (selectedDateMeetings.length === 0) {
+      setNoSchedule(true);
+    } else {
+      setNoSchedule(false);
+    }
   };
 
   const meetingsByDate = useMemo(
@@ -271,7 +278,7 @@ export default function MeetingSchedule({ route }) {
             </Animated.View>
           </PanGestureHandler>
         </View>
-        <View style={styles.ScheduleCardContainer}>
+        <View style={styles.scheduleCardContainer}>
           {selectedDateMeetings.map((meeting, index) => (
             <ScheduleCard
               key={index}
@@ -294,6 +301,9 @@ export default function MeetingSchedule({ route }) {
               }
             />
           ))}
+          {noSchedule && (
+            <Text style={styles.noScheduleText}>일정이 없습니다</Text>
+          )}
         </View>
       </ScrollView>
       <Snackbar
@@ -310,11 +320,11 @@ export default function MeetingSchedule({ route }) {
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF8EA",
     flex: 1,
   },
   container: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF8EA",
     alignItems: "center",
     marginBottom: 10,
   },
@@ -328,6 +338,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 30,
     fontWeight: "bold",
+    fontFamily: "Jua",
   },
   headerButton: {
     marginTop: 20,
@@ -335,6 +346,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     fontSize: 20,
     fontWeight: "bold",
+    fontFamily: "Jua",
   },
   month: {
     flexDirection: "column",
@@ -353,7 +365,8 @@ const styles = StyleSheet.create({
   weekDayText: {
     fontSize: 17,
     textAlign: "center",
-    fontWeight: "bold",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   daysContainer: {
     flexDirection: "row",
@@ -371,17 +384,19 @@ const styles = StyleSheet.create({
   dayText: {
     fontSize: 15,
     textAlign: "center",
-    fontWeight: "bold",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   today: {
-    backgroundColor: "#eee",
+    backgroundColor: "#594545",
     borderRadius: 50,
   },
   todayText: {
-    fontWeight: "bold",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   selectedDay: {
-    borderColor: "red",
+    borderColor: "#594545",
     borderWidth: 2,
     borderRadius: 50,
   },
@@ -391,6 +406,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     width: "90%",
+    backgroundColor: "#9E7676",
   },
   snackbar: {
     position: "absolute",
@@ -408,9 +424,20 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     color: "white",
     fontSize: 10,
+    fontFamily: "Jua",
   },
-  ScheduleCardContainer: {
+  scheduleCardContainer: {
     justifyContent: "center",
     alignItems: "center",
+  },
+  scheduleCard: {
+    backgroundColor: "#9E7676",
+  },
+  noScheduleText: {
+    textAlign: "center",
+    fontSize: 22,
+    color: "gray",
+    marginTop: 20,
+    fontFamily: "Jua",
   },
 });

@@ -22,7 +22,7 @@ export default function Header() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Meet-Up!</Text>
+        <Text style={styles.headerTitle}>Meet-UP!</Text>
         <View style={[styles.profile, { justifyContent: "flex-end" }]}>
           <View style={styles.profileImgContainer}>
             <Image
@@ -58,7 +58,7 @@ export default function Header() {
 const styles = StyleSheet.create({
   container: {
     marginTop: 50,
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF8EA",
     alignItems: "center",
   },
   header: {
@@ -73,11 +73,12 @@ const styles = StyleSheet.create({
   headerTitle: {
     width: "50%",
     fontWeight: "bold",
-    color: "#FF9900",
+    color: "#9E7676",
     textShadowColor: "rgba(0, 0, 0, 1)",
     textShadowOffset: { width: 1, height: 2 },
     textShadowRadius: 1,
-    fontSize: 30,
+    fontFamily: "GamjaFlower",
+    fontSize: 35,
   },
   profileImgContainer: {
     width: 35,
@@ -93,7 +94,8 @@ const styles = StyleSheet.create({
   },
   profileText: {
     fontWeight: "bold",
-    fontSize: 13,
+    fontFamily: "Jua",
+    fontSize: 15,
   },
   profileImg: {
     width: "100%",
@@ -106,7 +108,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   button: {
-    backgroundColor: "#FF9900",
+    backgroundColor: "#9E7676",
     padding: 10,
     width: "22%",
     marginRight: 5,
@@ -123,8 +125,8 @@ const styles = StyleSheet.create({
     shadowRadius: 1,
   },
   buttonText: {
-    color: "#FFF",
+    color: "#FFF8EA",
     fontSize: 14,
-    fontWeight: "bold",
+    fontFamily: "Jua",
   },
 });

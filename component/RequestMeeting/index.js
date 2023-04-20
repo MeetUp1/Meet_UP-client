@@ -69,7 +69,7 @@ export default function MeetingRequest({ route }) {
 
   const selectUser = (user) => {
     if (selectedUser === user) {
-      setSelectedUser(null);
+      setSelectedUser({});
     } else {
       setSelectedUser(user);
     }
@@ -77,8 +77,14 @@ export default function MeetingRequest({ route }) {
 
   const userContainerStyle = (user) => {
     return selectedUser === user
-      ? [styles.userContainer, { backgroundColor: "#C1FB9E" }]
+      ? [styles.userContainer, { backgroundColor: "#9E7676" }]
       : styles.userContainer;
+  };
+
+  const userTextStyle = (user) => {
+    return selectedUser === user
+      ? [styles.profileText, { color: "#FFF8EA" }]
+      : styles.profileText;
   };
 
   const nextStep = () => {
@@ -199,7 +205,7 @@ export default function MeetingRequest({ route }) {
                       style={styles.profileImg}
                     />
                   </View>
-                  <Text style={styles.profileText}>{user.name}</Text>
+                  <Text style={userTextStyle(user)}>{user.name}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -315,14 +321,14 @@ export default function MeetingRequest({ route }) {
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF8EA",
     flex: 1,
   },
   container: {
     alignItems: "center",
     justifyContent: "center",
     marginTop: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF8EA",
   },
   buttonContainer: {
     marginTop: 10,
@@ -353,21 +359,21 @@ const styles = StyleSheet.create({
   },
   stepNumberText: {
     fontSize: 25,
-    fontWeight: "bold",
+    fontFamily: "Jua",
   },
   stepTitleText: {
     fontSize: 25,
-    fontWeight: "bold",
+    fontFamily: "Jua",
   },
   disabledStepTitleText: {
     fontSize: 25,
-    fontWeight: "bold",
     color: "lightgray",
+    fontFamily: "Jua",
   },
   disabledStepNumberText: {
     fontSize: 25,
     color: "lightgray",
-    fontWeight: "bold",
+    fontFamily: "Jua",
   },
   input: {
     borderWidth: 2,
@@ -414,7 +420,7 @@ const styles = StyleSheet.create({
   profileText: {
     marginTop: 5,
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: "Jua",
   },
   profileScrollView: {
     flexDirection: "row",
@@ -430,7 +436,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 15,
     borderWidth: 2,
-    backgroundColor: "#C1FB9E",
+    backgroundColor: "#9E7676",
     shadowColor: "#000",
     shadowOffset: {
       width: 1,
@@ -441,7 +447,8 @@ const styles = StyleSheet.create({
   },
   nextButtonText: {
     fontSize: 20,
-    fontWeight: "bold",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   animatedView: {
     width: "100%",
@@ -454,12 +461,14 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 20,
     borderWidth: 2,
+    backgroundColor: "#9E7676",
   },
   contentText: {
     fontSize: 20,
-    fontWeight: "bold",
     marginTop: 15,
     marginLeft: 25,
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   contentInput: {
     borderWidth: 2,
@@ -468,6 +477,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     width: 300,
     height: 50,
+    backgroundColor: "#FFF8EA",
   },
   meetingContentContainer: {
     alignItems: "center",

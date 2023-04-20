@@ -173,7 +173,7 @@ export default function MeetingInfo() {
     );
 
     if (filteredMeeting.length === 0) {
-      return <Text style={styles.cardText}>미팅카드가 없습니다.</Text>;
+      return <Text style={styles.notFoundCardText}>미팅카드가 없습니다.</Text>;
     }
 
     return filteredMeeting.map((meeting, index) => (
@@ -325,7 +325,7 @@ export default function MeetingInfo() {
       key={index}
       style={[
         styles.button,
-        activeButton === index && { backgroundColor: "#FF5AD9" },
+        activeButton === index && { backgroundColor: "#594545" },
       ]}
       onPress={() => handlePress(index)}
     >
@@ -353,11 +353,11 @@ export default function MeetingInfo() {
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF8EA",
     flex: 1,
   },
   container: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF8EA",
     marginTop: 5,
     alignItems: "center",
     justifyContent: "center",
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   button: {
-    backgroundColor: "#FFC8FF",
+    backgroundColor: "#9E7676",
     padding: 10,
     width: "22%",
     marginRight: 5,
@@ -392,7 +392,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 14,
-    fontWeight: "bold",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   meetingListContainer: {
     marginTop: 20,
@@ -401,7 +402,7 @@ const styles = StyleSheet.create({
   meetingCard: {
     alignItems: "center",
     flexDirection: "column",
-    backgroundColor: "#FFD6F5",
+    backgroundColor: "#9E7676",
     width: 320,
     padding: 10,
     borderWidth: 2,
@@ -417,13 +418,22 @@ const styles = StyleSheet.create({
   },
   cardName: {
     fontSize: 20,
-    fontWeight: "bold",
     marginLeft: 5,
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   cardText: {
     marginLeft: 5,
     fontSize: 17,
-    fontWeight: "bold",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
+  },
+  notFoundCardText: {
+    marginLeft: 5,
+    marginTop: 20,
+    fontSize: 22,
+    color: "gray",
+    fontFamily: "Jua",
   },
   profileImgContainer: {
     width: 50,
@@ -443,7 +453,8 @@ const styles = StyleSheet.create({
   },
   meetingContentContainer: {
     justifyContent: "center",
-    backgroundColor: "#FFD6F5",
+    backgroundColor: "#9E7676",
+    borderColor: "#594545",
     marginTop: 5,
     width: 300,
     height: 70,
@@ -458,7 +469,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   meetingButton: {
-    backgroundColor: "#FF64E3",
+    backgroundColor: "#815B5B",
     padding: 10,
     width: 100,
     height: 40,
@@ -485,11 +496,13 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     width: 290,
     height: 30,
+    backgroundColor: "#FFF8EA",
   },
   inputText: {
     marginLeft: 5,
     marginTop: 10,
     fontSize: 17,
-    fontWeight: "bold",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
 });

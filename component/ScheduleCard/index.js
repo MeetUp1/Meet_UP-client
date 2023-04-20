@@ -35,7 +35,7 @@ const ScheduleCard = ({ name, time, agenda, address, picture }) => {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "#9E7676",
     borderRadius: 20,
     marginTop: 10,
     marginBottom: 10,
@@ -46,10 +46,13 @@ const styles = StyleSheet.create({
   cardTitle: {
     marginRight: 5,
     fontSize: 20,
-    fontWeight: "bold",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   cardTime: {
     fontSize: 18,
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   cardDetails: {
     marginTop: 10,
@@ -57,10 +60,12 @@ const styles = StyleSheet.create({
   subtitleTitle: {
     fontSize: 17,
     marginBottom: 5,
-    fontWeight: "bold",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   subtitleContainer: {
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "#9E7676",
+    borderColor: "#594545",
     borderRadius: 10,
     marginTop: 5,
     marginBottom: 10,
@@ -70,6 +75,8 @@ const styles = StyleSheet.create({
   },
   subtitleContent: {
     fontSize: 15,
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   profileImgContainer: {
     width: 50,

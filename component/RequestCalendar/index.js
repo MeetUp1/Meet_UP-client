@@ -370,12 +370,12 @@ export default function RequestCalendar({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF8EA",
     alignItems: "center",
     marginTop: 10,
   },
   buttonContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF8EA",
     justifyContent: "center",
     alignItems: "center",
     marginTop: 10,
@@ -392,13 +392,13 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 30,
-    fontWeight: "bold",
+    fontFamily: "Jua",
   },
   headerButton: {
     marginRight: 15,
     marginLeft: 15,
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: "Jua",
   },
   month: {
     flexDirection: "column",
@@ -416,7 +416,8 @@ const styles = StyleSheet.create({
   weekDayText: {
     fontSize: 17,
     textAlign: "center",
-    fontWeight: "bold",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   daysContainer: {
     flexDirection: "row",
@@ -434,17 +435,19 @@ const styles = StyleSheet.create({
   dayText: {
     fontSize: 15,
     textAlign: "center",
-    fontWeight: "bold",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   today: {
-    backgroundColor: "#eee",
+    backgroundColor: "#594545",
     borderRadius: 50,
   },
   todayText: {
-    fontWeight: "bold",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   selectedDay: {
-    borderColor: "red",
+    borderColor: "#594545",
     borderWidth: 2,
     borderRadius: 50,
   },
@@ -454,6 +457,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     width: "90%",
+    backgroundColor: "#9E7676",
   },
   timePeriodContainer: {
     flexDirection: "row",
@@ -465,7 +469,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 25,
     marginHorizontal: 10,
-    backgroundColor: "khaki",
+    backgroundColor: "#9E7676",
     width: "22%",
     marginRight: 5,
     alignItems: "center",
@@ -481,13 +485,15 @@ const styles = StyleSheet.create({
   },
   timePeriodText: {
     fontSize: 20,
-    fontWeight: "bold",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   timePeriodSelected: {
-    backgroundColor: "green",
+    backgroundColor: "#594545",
   },
   timePeriodSelectedText: {
-    color: "white",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   hoursContainer: {
     flexDirection: "row",
@@ -507,13 +513,14 @@ const styles = StyleSheet.create({
   },
   hourText: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: "Jua",
   },
   selectedHour: {
-    backgroundColor: "gray",
+    backgroundColor: "#9E7676",
   },
   selectedHourText: {
-    color: "white",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   nextButton: {
     alignItems: "center",
@@ -526,7 +533,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 15,
     borderWidth: 2,
-    backgroundColor: "#C1FB9E",
+    backgroundColor: "#9E7676",
     shadowColor: "#000",
     shadowOffset: {
       width: 1,
@@ -537,13 +544,15 @@ const styles = StyleSheet.create({
   },
   nextButtonText: {
     fontSize: 20,
-    fontWeight: "bold",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   unavailableHour: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#594545",
   },
   unavailableHourText: {
     color: "#999",
+    fontFamily: "Jua",
   },
   meetingCount: {
     position: "absolute",

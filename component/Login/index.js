@@ -76,18 +76,7 @@ export default function Login() {
   return (
     <View style={styles.container}>
       <View style={styles.headingContainer}>
-        <Animated.Text
-          style={{
-            fontSize: 60,
-            fontWeight: "bold",
-            color: "#FF9900",
-            textShadowColor: "rgba(0, 0, 0, 0.75)",
-            textShadowOffset: { width: 1, height: 3 },
-            textShadowRadius: 1,
-          }}
-        >
-          Meet-Up
-        </Animated.Text>
+        <Animated.Text style={styles.logoText}>Meet-UP</Animated.Text>
         <Animated.Text
           style={[
             styles.headingExclamation,
@@ -120,28 +109,36 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF8EA",
   },
   headingContainer: {
     flexDirection: "row",
     alignItems: "flex-end",
     marginBottom: 100,
   },
+  logoText: {
+    fontSize: 80,
+    fontFamily: "GamjaFlower",
+    color: "#9E7676",
+    textShadowColor: "rgba(0, 0, 0, 0.75)",
+    textShadowOffset: { width: 1, height: 3 },
+    textShadowRadius: 1,
+  },
   headingExclamation: {
-    fontSize: 60,
-    fontWeight: "bold",
-    color: "#FF9900",
+    fontSize: 80,
+    fontFamily: "GamjaFlower",
+    color: "#9E7676",
   },
   button: {
     alignItems: "center",
     justifyContent: "center",
     width: 150,
     height: 60,
-    backgroundColor: "#FF9900",
+    backgroundColor: "#9E7676",
     paddingHorizontal: 24,
     paddingVertical: 12,
-    borderRadius: 25,
-    borderWidth: 1,
+    borderRadius: 20,
+    borderWidth: 2,
     borderColor: "#000",
     shadowColor: "#000",
     shadowOffset: {
@@ -152,7 +149,9 @@ const styles = StyleSheet.create({
     shadowRadius: 1,
   },
   buttonText: {
+    color: "#FFF8EA",
     fontSize: 20,
+    fontFamily: "Jua",
     fontWeight: "bold",
   },
 });

@@ -355,11 +355,11 @@ export default function CreateMeeting() {
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF8EA",
     flex: 1,
   },
   container: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF8EA",
     alignItems: "center",
     marginTop: 20,
   },
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginLeft: 20,
     fontSize: 15,
-    fontWeight: "bold",
+    fontFamily: "Jua",
   },
   header: {
     flexDirection: "row",
@@ -377,13 +377,13 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 30,
-    fontWeight: "bold",
+    fontFamily: "Jua",
   },
   headerButton: {
     marginRight: 15,
     marginLeft: 15,
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: "Jua",
   },
   month: {
     flexDirection: "column",
@@ -401,7 +401,8 @@ const styles = StyleSheet.create({
   weekDayText: {
     fontSize: 17,
     textAlign: "center",
-    fontWeight: "bold",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   daysContainer: {
     flexDirection: "row",
@@ -419,17 +420,19 @@ const styles = StyleSheet.create({
   dayText: {
     fontSize: 15,
     textAlign: "center",
-    fontWeight: "bold",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   today: {
-    backgroundColor: "#eee",
+    backgroundColor: "#594545",
     borderRadius: 50,
   },
   todayText: {
-    fontWeight: "bold",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   selectedDay: {
-    borderColor: "red",
+    borderColor: "#594545",
     borderWidth: 2,
     borderRadius: 50,
   },
@@ -439,6 +442,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     width: "90%",
+    backgroundColor: "#9E7676",
   },
   timePeriodContainer: {
     flexDirection: "row",
@@ -450,7 +454,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 25,
     marginHorizontal: 10,
-    backgroundColor: "khaki",
+    backgroundColor: "#9E7676",
     width: "22%",
     marginRight: 5,
     alignItems: "center",
@@ -466,13 +470,15 @@ const styles = StyleSheet.create({
   },
   timePeriodText: {
     fontSize: 20,
-    fontWeight: "bold",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   timePeriodSelected: {
-    backgroundColor: "green",
+    backgroundColor: "#594545",
   },
   timePeriodSelectedText: {
-    color: "white",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   hoursContainer: {
     flexDirection: "row",
@@ -492,17 +498,18 @@ const styles = StyleSheet.create({
   },
   hourText: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: "Jua",
   },
   selectedHour: {
-    backgroundColor: "gray",
+    backgroundColor: "#9E7676",
   },
   selectedHourText: {
-    color: "white",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   button: {
     alignItems: "center",
-    backgroundColor: "#FF9900",
+    backgroundColor: "#9E7676",
     padding: 10,
     width: "35%",
     marginBottom: 50,
@@ -518,13 +525,15 @@ const styles = StyleSheet.create({
     shadowRadius: 1,
   },
   buttonText: {
-    fontSize: 25,
-    fontWeight: "bold",
+    fontSize: 22,
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
   disabledHour: {
-    backgroundColor: "orange",
+    backgroundColor: "#594545",
   },
   disabledHourText: {
-    color: "#FFF",
+    color: "#FFF8EA",
+    fontFamily: "Jua",
   },
 });
