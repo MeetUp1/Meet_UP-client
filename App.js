@@ -1,9 +1,10 @@
 import { NavigationContainer } from "@react-navigation/native";
 import * as Font from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
+import LottieView from "lottie-react-native";
 import React, { useState, useEffect } from "react";
 import { Provider } from "react-redux";
 
+import animation from "./assets/animation.json/meeting-and-stuff.json";
 import Root from "./component/App";
 import store from "./store/configureStore";
 
@@ -20,13 +21,13 @@ export default function App() {
   useEffect(() => {
     async function prepare() {
       try {
-        await SplashScreen.preventAutoHideAsync();
         await loadFonts();
       } catch (e) {
         console.warn(e);
       } finally {
-        setIsReady(true);
-        SplashScreen.hideAsync();
+        setTimeout(() => {
+          setIsReady(true);
+        }, 4000);
       }
     }
 
@@ -34,7 +35,14 @@ export default function App() {
   }, []);
 
   if (!isReady) {
-    return null;
+    return (
+      <LottieView
+        source={animation}
+        autoPlay
+        loop
+        style={{ flex: 1, backgroundColor: "#FFF8EA" }}
+      />
+    );
   }
 
   return (

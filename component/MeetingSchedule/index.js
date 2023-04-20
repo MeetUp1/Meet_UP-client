@@ -120,7 +120,6 @@ export default function MeetingSchedule({ route }) {
   const [meetingList, setMeetingList] = useState([]);
   const [selectedDateMeetings, setSelectedDateMeetings] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [noSchedule, setNoSchedule] = useState(false);
 
   const month = date.getMonth();
   const year = date.getFullYear();
@@ -216,12 +215,6 @@ export default function MeetingSchedule({ route }) {
   const onDaySelected = (selectedDate) => {
     const selectedDateMeetings = meetingsByDate[selectedDate.getDate()] || [];
     setSelectedDateMeetings(selectedDateMeetings);
-
-    if (selectedDateMeetings.length === 0) {
-      setNoSchedule(true);
-    } else {
-      setNoSchedule(false);
-    }
   };
 
   const meetingsByDate = useMemo(
@@ -301,7 +294,7 @@ export default function MeetingSchedule({ route }) {
               }
             />
           ))}
-          {noSchedule && (
+          {selectedDateMeetings.length === 0 && (
             <Text style={styles.noScheduleText}>일정이 없습니다</Text>
           )}
         </View>
