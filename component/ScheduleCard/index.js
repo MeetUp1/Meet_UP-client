@@ -1,11 +1,19 @@
+import * as Clipboard from "expo-clipboard";
 import React, { useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 
-const ScheduleCard = ({ name, time, agenda, address, picture }) => {
+const ScheduleCard = ({ name, time, agenda, address, picture, onCopy }) => {
   const [expanded, setExpanded] = useState(false);
 
   const toggleExpanded = () => {
     setExpanded(!expanded);
+  };
+
+  const copyToClipboard = async () => {
+    await Clipboard.setStringAsync(address);
+    if (onCopy) {
+      onCopy();
+    }
   };
 
   return (
@@ -25,7 +33,13 @@ const ScheduleCard = ({ name, time, agenda, address, picture }) => {
           </View>
           <View style={styles.subtitleContainer}>
             <Text style={styles.subtitleTitle}>미팅주소</Text>
-            <Text style={styles.subtitleContent}>{address}</Text>
+            <TouchableOpacity
+              onLongPress={copyToClipboard}
+              delayLongPress={1000}
+              style={styles.subtitleContentTouchable}
+            >
+              <Text style={styles.subtitleContent}>{address}</Text>
+            </TouchableOpacity>
           </View>
         </View>
       )}

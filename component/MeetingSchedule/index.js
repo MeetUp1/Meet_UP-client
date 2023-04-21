@@ -116,6 +116,7 @@ const MonthView = ({
 
 export default function MeetingSchedule({ route }) {
   const [visibleSnackbar, setVisibleSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
   const [date, setDate] = useState(new Date());
   const [meetingList, setMeetingList] = useState([]);
   const [selectedDateMeetings, setSelectedDateMeetings] = useState([]);
@@ -225,6 +226,7 @@ export default function MeetingSchedule({ route }) {
   useEffect(() => {
     if (route.params && route.params.showSnackbar) {
       setVisibleSnackbar(true);
+      setSnackbarMessage(route.params.text);
     }
   }, [route]);
 
@@ -292,6 +294,10 @@ export default function MeetingSchedule({ route }) {
                   ? meeting.requestee.picture
                   : meeting.requester.picture
               }
+              onCopy={() => {
+                setSnackbarMessage("미팅 주소가 복사되었습니다.");
+                setVisibleSnackbar(true);
+              }}
             />
           ))}
           {selectedDateMeetings.length === 0 && (
@@ -303,9 +309,9 @@ export default function MeetingSchedule({ route }) {
         style={styles.snackbar}
         visible={visibleSnackbar}
         onDismiss={onDismissSnackBar}
-        duration={Snackbar.DURATION_SHORT}
+        duration={1500}
       >
-        {route.params?.text || "미팅 일정을 한번 더 클릭하셨습니다"}
+        {snackbarMessage}
       </Snackbar>
     </>
   );
