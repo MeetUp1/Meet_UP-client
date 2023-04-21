@@ -149,6 +149,17 @@ export default function MeetingInfo() {
     }
   };
 
+  const isMinutesPast = (meetingStartTime, minutes) => {
+    const now = new Date();
+    const meetingTime = new Date(meetingStartTime);
+    const nowLocal = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+    const meetingTimeLocal = new Date(
+      meetingTime.getTime() - meetingTime.getTimezoneOffset() * 60000,
+    );
+    const minuteDifference = (nowLocal - meetingTimeLocal) / 60000;
+    return minuteDifference >= minutes;
+  };
+
   useFocusEffect(
     useCallback(() => {
       async function fetchData() {
@@ -183,8 +194,10 @@ export default function MeetingInfo() {
           styles.meetingCard,
           expandedCards.includes(index) && {
             height:
-              activeButton === 0 || activeButton === 1
+              activeButton === 0
                 ? 290
+                : activeButton === 1
+                ? "auto"
                 : activeButton === 2 || activeButton === 3
                 ? 370
                 : 230,
@@ -244,21 +257,23 @@ export default function MeetingInfo() {
             )}
             {activeButton === 1 && (
               <>
-                <View style={styles.meetingButtonContainer}>
-                  <TouchableOpacity
-                    onPress={() =>
-                      completeMeeting(
-                        meeting.requester.id,
-                        meeting._id,
-                        meeting.startTime,
-                      )
-                    }
-                  >
-                    <View style={styles.meetingButton}>
-                      <Text style={styles.cardText}>미팅완료</Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
+                {isMinutesPast(meeting.startTime, 30) && (
+                  <View style={styles.meetingButtonContainer}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        completeMeeting(
+                          meeting.requester.id,
+                          meeting._id,
+                          meeting.startTime,
+                        )
+                      }
+                    >
+                      <View style={styles.meetingButton}>
+                        <Text style={styles.cardText}>미팅완료</Text>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </>
             )}
             {activeButton === 2 && (

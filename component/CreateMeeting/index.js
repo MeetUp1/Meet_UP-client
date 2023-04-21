@@ -48,7 +48,11 @@ const MonthView = ({ month, year, selectedDate, setSelectedDate }) => {
   today.setHours(0, 0, 0, 0);
 
   const onDayPress = (day) => {
-    setSelectedDate(day);
+    const currentDay = new Date();
+    currentDay.setHours(0, 0, 0, 0);
+    if (day >= currentDay) {
+      setSelectedDate(day);
+    }
   };
 
   return (
@@ -73,19 +77,26 @@ const MonthView = ({ month, year, selectedDate, setSelectedDate }) => {
             const isToday = day.getTime() === today.getTime();
             const isSelected =
               selectedDate && day.getTime() === selectedDate.getTime();
+            const isPast = day < today;
 
             const dayStyle = [
               styles.day,
               isToday && styles.today,
               isSelected && styles.selectedDay,
+              isPast && styles.pastDay,
             ];
-            const dayTextStyle = isToday ? styles.todayText : styles.dayText;
+            const dayTextStyle = isToday
+              ? styles.todayText
+              : isPast
+              ? styles.pastDayText
+              : styles.dayText;
 
             return (
               <TouchableOpacity
                 key={`day-${index}`}
                 style={dayStyle}
                 onPress={() => onDayPress(day)}
+                disabled={isPast}
               >
                 <Text style={dayTextStyle}>{index + 1}</Text>
               </TouchableOpacity>
@@ -113,6 +124,9 @@ export default function CreateMeeting() {
   const year = date.getFullYear();
 
   const navigation = useNavigation();
+
+  const now = new Date();
+  const currentHour = now.getHours();
 
   const handleMeetingSchedule = async () => {
     navigation.navigate("MeetingSchedule", {
@@ -312,7 +326,10 @@ export default function CreateMeeting() {
                 );
               });
 
-              const isDisabled = isCompleteTime(selectedDate, hour);
+              const isDisabled =
+                isCompleteTime(selectedDate, hour) ||
+                (selectedDate.getTime() === now.setHours(0, 0, 0, 0) &&
+                  hour < currentHour);
 
               return (
                 <TouchableOpacity
@@ -534,6 +551,15 @@ const styles = StyleSheet.create({
   },
   disabledHourText: {
     color: "#FFF8EA",
+    fontFamily: "Jua",
+  },
+  pastDay: {
+    backgroundColor: "#9E7676",
+  },
+
+  pastDayText: {
+    color: "#A0A0A0",
+    fontSize: 15,
     fontFamily: "Jua",
   },
 });

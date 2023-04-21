@@ -86,13 +86,18 @@ const MonthView = ({
               day.getDate() === today.getDate();
             const isSelected =
               selectedDate && day.getTime() === selectedDate.getTime();
+            const isPastDate = day.getTime() < today.getTime();
 
             const dayStyle = [
               styles.day,
               isToday && styles.today,
               isSelected && styles.selectedDay,
             ];
-            const dayTextStyle = isToday ? styles.todayText : styles.dayText;
+            const dayTextStyle = isToday
+              ? styles.todayText
+              : isPastDate
+              ? styles.pastDateText
+              : styles.dayText;
 
             const meetingCount = getMeetingCountForDate(day);
 
@@ -100,7 +105,8 @@ const MonthView = ({
               <TouchableOpacity
                 key={`day-${index}`}
                 style={dayStyle}
-                onPress={() => onDayPress(day)}
+                onPress={() => !isPastDate && onDayPress(day)}
+                disabled={isPastDate}
               >
                 <Text style={dayTextStyle}>{index + 1}</Text>
                 {meetingCount > 0 && (
@@ -564,5 +570,10 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     color: "white",
     fontSize: 10,
+  },
+  pastDateText: {
+    color: "#A0A0A0",
+    fontSize: 15,
+    fontFamily: "Jua",
   },
 });
