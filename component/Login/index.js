@@ -48,9 +48,16 @@ export default function Login() {
       if (user) {
         dispatch(userLogin(user));
         navigation.navigate("MeetingSchedule");
-        await axios.post(`${LOGIN_API_URL}/api/users/login`, {
-          user,
-        });
+        const postRequest = await axios.post(
+          `${LOGIN_API_URL}/api/users/login`,
+          {
+            user,
+          },
+        );
+
+        if (postRequest.status === 200) {
+          await axios.patch(`${LOGIN_API_URL}/api/users/${user.id}/checkTime`);
+        }
       }
     } catch (error) {
       //에러 페이지 이동
