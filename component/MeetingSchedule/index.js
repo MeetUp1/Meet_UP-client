@@ -274,9 +274,9 @@ export default function MeetingSchedule({ route }) {
           </PanGestureHandler>
         </View>
         <View style={styles.scheduleCardContainer}>
-          {selectedDateMeetings.map((meeting, index) => (
+          {selectedDateMeetings.map((meeting) => (
             <ScheduleCard
-              key={index}
+              key={meeting._id}
               name={
                 currentUser.name === meeting.requester.name
                   ? meeting.requestee.name

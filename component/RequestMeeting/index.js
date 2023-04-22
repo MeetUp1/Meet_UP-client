@@ -193,9 +193,9 @@ export default function MeetingRequest({ route }) {
         {step === 1 && (
           <View style={styles.container}>
             <View style={styles.profileScrollView}>
-              {foundUsers.map((user, index) => (
+              {foundUsers.map((user) => (
                 <TouchableOpacity
-                  key={index}
+                  key={user.id}
                   style={userContainerStyle(user)}
                   onPress={() => selectUser(user)}
                 >
