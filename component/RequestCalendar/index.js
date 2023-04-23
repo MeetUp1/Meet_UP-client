@@ -1,5 +1,5 @@
 import { LOGIN_API_URL } from "@env";
-import { useFocusEffect } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import axios from "axios";
 import React, { useState, useMemo, useCallback } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
@@ -135,6 +135,11 @@ export default function RequestCalendar({
     today.setHours(0, 0, 0, 0);
     return today;
   });
+  const navigation = useNavigation();
+
+  const navigateToLoginPage = () => {
+    navigation.navigate("ErrorPage");
+  };
 
   const month = date.getMonth();
   const year = date.getFullYear();
@@ -252,7 +257,7 @@ export default function RequestCalendar({
           const openTime = response.data.openTime || null;
           setSelectUserTime(openTime);
         } catch (error) {
-          console.error("Error fetching user data:", error);
+          navigateToLoginPage();
         }
       }
       fetchData();

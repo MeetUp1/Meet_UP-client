@@ -128,6 +128,10 @@ export default function CreateMeeting() {
   const now = new Date();
   const currentHour = now.getHours();
 
+  const navigateToLoginPage = () => {
+    navigation.navigate("ErrorPage");
+  };
+
   const handleMeetingSchedule = async () => {
     navigation.navigate("MeetingSchedule", {
       showSnackbar: true,
@@ -138,7 +142,7 @@ export default function CreateMeeting() {
         selectedDateTime,
       });
     } catch (error) {
-      // 오류 화면 렌더링
+      navigateToLoginPage();
     }
   };
 

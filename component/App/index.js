@@ -7,6 +7,7 @@ import Login from "../Login";
 import MeetingInfo from "../MeetingInfo";
 import MeetingSchedule from "../MeetingSchedule";
 import MeetingRequest from "../RequestMeeting";
+import ErrorPage from "../error";
 
 const Stack = createStackNavigator();
 
@@ -27,6 +28,11 @@ export default function Root() {
       <Stack.Screen name="MeetingInfo" component={MeetingInfo} />
       <Stack.Screen name="MeetingSchedule" component={MeetingSchedule} />
       <Stack.Screen name="MeetingRequest" component={MeetingRequest} />
+      <Stack.Screen
+        name="ErrorPage"
+        component={ErrorPage}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 }

@@ -14,6 +14,8 @@ import {
 } from "react-native";
 import { useSelector } from "react-redux";
 
+import sendNotification from "../../expoPush";
+
 export default function MeetingInfo() {
   const [activeButton, setActiveButton] = useState(0);
   const [expandedCards, setExpandedCards] = useState([]);
@@ -23,6 +25,10 @@ export default function MeetingInfo() {
   const navigation = useNavigation();
 
   const { currentUser } = useSelector((state) => state);
+
+  const navigateToLoginPage = () => {
+    navigation.navigate("ErrorPage");
+  };
 
   const fetchData = useCallback(async () => {
     const response = await axios.get(
@@ -45,7 +51,7 @@ export default function MeetingInfo() {
         userinfo: response.data,
       });
     } catch (error) {
-      //에러 페이지
+      navigateToLoginPage();
     }
   };
 
@@ -64,12 +70,17 @@ export default function MeetingInfo() {
     }
   };
 
-  const handleAccept = async (id) => {
+  const handleAccept = async (id, expoPushToken, requesterName) => {
     const patchResponse = await axios.patch(
       `${LOGIN_API_URL}/api/meetings/${id}/accept`,
     );
 
     if (patchResponse.status === 200) {
+      await sendNotification(
+        expoPushToken,
+        "미팅이 수락되었습니다",
+        `${requesterName}님이 미팅을 수락했습니다`,
+      );
       handleButtonClick();
     }
   };
@@ -88,11 +99,17 @@ export default function MeetingInfo() {
         handleButtonClick();
       }
     } catch (error) {
-      console.log(error);
+      navigateToLoginPage();
     }
   };
 
-  const handleRejected = async (userId, meetingId, time) => {
+  const handleRejected = async (
+    userId,
+    meetingId,
+    time,
+    expoPushToken,
+    requesterName,
+  ) => {
     if (inputRejected.length === 0) {
       Alert.alert("Error", "거절 사유를 입력해주세요.");
       return;
@@ -114,11 +131,16 @@ export default function MeetingInfo() {
         );
 
         if (patchResponse.status === 200) {
+          await sendNotification(
+            expoPushToken,
+            "미팅이 거절되었습니다",
+            `${requesterName}님이 미팅을 거절했습니다`,
+          );
           handleButtonClick();
         }
       }
     } catch (error) {
-      console.log(error);
+      navigateToLoginPage();
     }
   };
 
@@ -136,7 +158,7 @@ export default function MeetingInfo() {
         handleButtonClick();
       }
     } catch (error) {
-      console.log(error);
+      navigateToLoginPage();
     }
   };
 
@@ -145,7 +167,7 @@ export default function MeetingInfo() {
       await axios.delete(`${LOGIN_API_URL}/api/meetings/${meetingId}`);
       handleButtonClick();
     } catch (error) {
-      console.log(error);
+      navigateToLoginPage();
     }
   };
 
@@ -287,7 +309,15 @@ export default function MeetingInfo() {
                   />
                 </View>
                 <View style={styles.meetingButtonContainer}>
-                  <TouchableOpacity onPress={() => handleAccept(meeting._id)}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      handleAccept(
+                        meeting._id,
+                        meeting.requestee.expoPushToken,
+                        meeting.requester.name,
+                      )
+                    }
+                  >
                     <View style={styles.meetingButton}>
                       <Text style={styles.cardText}>수락</Text>
                     </View>
@@ -298,6 +328,8 @@ export default function MeetingInfo() {
                         meeting.requester.id,
                         meeting._id,
                         meeting.startTime,
+                        meeting.requestee.expoPushToken,
+                        meeting.requester.name,
                       )
                     }
                   >

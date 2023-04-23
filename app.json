@@ -13,6 +13,7 @@
       "bundleIdentifier": "com.meetup.login"
     },
     "android": {
+      "useNextNotificationsApi": true,
       "package": "com.meetup.login",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",

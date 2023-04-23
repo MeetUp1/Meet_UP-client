@@ -1,15 +1,59 @@
-import { CLIENT_ID, IOS_CLIENT_ID, LOGIN_API_URL } from "@env";
+import {
+  CLIENT_ID,
+  IOS_CLIENT_ID,
+  LOGIN_API_URL,
+  ANDROID_CLIENT_ID,
+} from "@env";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import * as Google from "expo-auth-session/providers/google";
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
 import * as WebBrowser from "expo-web-browser";
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, TouchableOpacity, Animated } from "react-native";
+import {
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Animated,
+  Platform,
+} from "react-native";
 import { useDispatch } from "react-redux";
 
-import { userLogin } from "../../features/reducers/loginSlice";
+import { userLogin, expoToken } from "../../features/reducers/loginSlice";
 
 WebBrowser.maybeCompleteAuthSession();
+
+async function registerForPushNotificationsAsync() {
+  let token;
+  if (Device.isDevice) {
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== "granted") {
+      alert("Failed to get push token for push notification!");
+      return;
+    }
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+  } else {
+    alert("Must use physical device for Push Notifications");
+  }
+
+  if (Platform.OS === "android") {
+    Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: "#FF231F7C",
+    });
+  }
+
+  return token;
+}
 
 export default function Login() {
   const [animatedValue, setAnimatedValue] = useState(new Animated.Value(0));
@@ -21,8 +65,13 @@ export default function Login() {
   const [request, response, promptAsync] = Google.useAuthRequest({
     clientId: CLIENT_ID,
     iosClientId: IOS_CLIENT_ID,
+    androidClientId: ANDROID_CLIENT_ID,
     prompt: "select_account",
   });
+
+  const navigateToLoginPage = () => {
+    navigation.navigate("ErrorPage");
+  };
 
   useEffect(() => {
     if (response?.type === "success") {
@@ -45,23 +94,26 @@ export default function Login() {
       );
 
       const user = await response.json();
+
       if (user) {
+        const expoPushToken = await registerForPushNotificationsAsync();
+        dispatch(expoToken(expoPushToken));
         dispatch(userLogin(user));
-        navigation.navigate("MeetingSchedule");
         const postRequest = await axios.post(
           `${LOGIN_API_URL}/api/users/login`,
           {
             user,
+            expoPushToken,
           },
         );
 
         if (postRequest.status === 200) {
           await axios.patch(`${LOGIN_API_URL}/api/users/${user.id}/checkTime`);
+          navigation.navigate("MeetingSchedule");
         }
       }
     } catch (error) {
-      //에러 페이지 이동
-      console.log(error);
+      navigateToLoginPage();
     }
   };
 

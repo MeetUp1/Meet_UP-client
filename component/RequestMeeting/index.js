@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { useSelector } from "react-redux";
 
+import sendNotification from "../../expoPush";
 import RequestCalendar from "../RequestCalendar";
 
 export default function MeetingRequest({ route }) {
@@ -33,12 +34,17 @@ export default function MeetingRequest({ route }) {
   const [selectUserUTCTime, setSelectUserUTCTime] = useState("");
 
   const { currentUser } = useSelector((state) => state);
+  const { expoPushToken } = useSelector((state) => state);
 
   const stepAnimation = useRef(
     new Animated.Value(route.params ? route.params.initialStep - 1 : 0),
   ).current;
 
   const navigation = useNavigation();
+
+  const navigateToLoginPage = () => {
+    navigation.navigate("ErrorPage");
+  };
 
   const handleMeetingSchedule = () => {
     navigation.navigate("MeetingSchedule", {
@@ -129,7 +135,7 @@ export default function MeetingRequest({ route }) {
   const handleChangeSchedule = async () => {
     try {
       const patchRequest = await axios.patch(
-        `${LOGIN_API_URL}/api/users/${foundUsers[0].id}/changeTime`,
+        `${LOGIN_API_URL}/api/users/${selectedUser.id}/changeTime`,
         {
           selectUserUTCTime,
         },
@@ -141,16 +147,21 @@ export default function MeetingRequest({ route }) {
             title: content,
             location: address,
             startTime: selectUserUTCTime,
-            requester: foundUsers[0],
-            requestee: currentUser,
+            requester: selectedUser,
+            requestee: { ...currentUser, expoPushToken },
           },
         );
         if (postRequest.status === 200) {
+          await sendNotification(
+            selectedUser.expoPushToken,
+            "새로운 미팅이 신청되었습니다!",
+            `${currentUser.name}님이 미팅을 신청하였습니다.`,
+          );
           handleMeetingSchedule();
         }
       }
     } catch (error) {
-      // 오류 화면 렌더링
+      navigateToLoginPage();
     }
   };
 
@@ -301,7 +312,7 @@ export default function MeetingRequest({ route }) {
                   >
                     <Text style={styles.nextButtonText}>뒤로</Text>
                   </TouchableOpacity>
-                  {content && (
+                  {content && address && (
                     <TouchableOpacity
                       style={styles.nextButton}
                       onPress={handleChangeSchedule}
