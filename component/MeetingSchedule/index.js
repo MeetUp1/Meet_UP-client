@@ -8,6 +8,7 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
+  Platform,
 } from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
 import { Snackbar } from "react-native-paper";
@@ -283,7 +284,9 @@ export default function MeetingSchedule({ route }) {
                   : `${meeting.requester.name}🤝`
               }
               time={
-                new Date(meeting.startTime).toLocaleString()[20] === "0"
+                Platform.OS === "android"
+                  ? new Date(meeting.startTime).toLocaleString().slice(0, 16)
+                  : new Date(meeting.startTime).toLocaleString()[20] === "0"
                   ? new Date(meeting.startTime).toLocaleString().slice(0, 21)
                   : new Date(meeting.startTime).toLocaleString().slice(0, 20)
               }
@@ -336,7 +339,7 @@ const styles = StyleSheet.create({
   headerText: {
     marginTop: 20,
     fontSize: 30,
-    fontWeight: "bold",
+
     fontFamily: "Jua",
   },
   headerButton: {
@@ -344,7 +347,6 @@ const styles = StyleSheet.create({
     marginRight: 15,
     marginLeft: 15,
     fontSize: 20,
-    fontWeight: "bold",
     fontFamily: "Jua",
   },
   month: {

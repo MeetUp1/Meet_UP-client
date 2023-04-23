@@ -294,6 +294,7 @@ export default function MeetingRequest({ route }) {
                       style={styles.contentInput}
                       onChangeText={inputContent}
                       placeholder="미팅 안건을 입력 해주세요"
+                      maxLength={16}
                     />
                   </View>
                   <Text style={styles.contentText}>미팅 주소</Text>
@@ -467,7 +468,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   contentContainer: {
-    width: 350,
+    width: 320,
     height: 230,
     marginTop: 20,
     borderRadius: 20,
@@ -486,7 +487,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    width: 300,
+    width: "90%",
     height: 50,
     backgroundColor: "#FFF8EA",
   },

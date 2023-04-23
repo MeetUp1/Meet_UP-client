@@ -1,6 +1,13 @@
 import * as Clipboard from "expo-clipboard";
 import React, { useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  Dimensions,
+} from "react-native";
 
 const ScheduleCard = ({ name, time, agenda, address, picture, onCopy }) => {
   const [expanded, setExpanded] = useState(false);
@@ -47,6 +54,8 @@ const ScheduleCard = ({ name, time, agenda, address, picture, onCopy }) => {
   );
 };
 
+const { width: screenWidth } = Dimensions.get("window");
+
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#9E7676",
@@ -59,12 +68,12 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     marginRight: 5,
-    fontSize: 20,
+    fontSize: screenWidth * 0.05,
     color: "#FFF8EA",
     fontFamily: "Jua",
   },
   cardTime: {
-    fontSize: 18,
+    fontSize: screenWidth * 0.05,
     color: "#FFF8EA",
     fontFamily: "Jua",
   },
@@ -72,7 +81,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   subtitleTitle: {
-    fontSize: 17,
+    fontSize: screenWidth * 0.045,
     marginBottom: 5,
     color: "#FFF8EA",
     fontFamily: "Jua",
@@ -88,7 +97,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   subtitleContent: {
-    fontSize: 15,
+    fontSize: screenWidth * 0.04,
     color: "#FFF8EA",
     fontFamily: "Jua",
   },

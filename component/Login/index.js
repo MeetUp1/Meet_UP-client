@@ -211,6 +211,5 @@ const styles = StyleSheet.create({
     color: "#FFF8EA",
     fontSize: 20,
     fontFamily: "Jua",
-    fontWeight: "bold",
   },
 });

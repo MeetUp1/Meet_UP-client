@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
     width: "22%",
     marginRight: 5,
     alignItems: "center",
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: "#000",
     shadowColor: "#000",
     shadowOffset: {

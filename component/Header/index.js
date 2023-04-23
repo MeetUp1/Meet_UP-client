@@ -1,6 +1,13 @@
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  Dimensions,
+} from "react-native";
 import { useSelector } from "react-redux";
 
 export default function Header() {
@@ -55,6 +62,8 @@ export default function Header() {
   );
 }
 
+const { width: screenWidth } = Dimensions.get("window");
+
 const styles = StyleSheet.create({
   container: {
     marginTop: 50,
@@ -72,13 +81,12 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     width: "50%",
-    fontWeight: "bold",
     color: "#9E7676",
     textShadowColor: "rgba(0, 0, 0, 1)",
     textShadowOffset: { width: 1, height: 2 },
     textShadowRadius: 1,
     fontFamily: "GamjaFlower",
-    fontSize: 35,
+    fontSize: screenWidth * 0.1,
   },
   profileImgContainer: {
     width: 35,
@@ -93,9 +101,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   profileText: {
-    fontWeight: "bold",
     fontFamily: "Jua",
-    fontSize: 15,
+    fontSize: screenWidth * 0.04,
   },
   profileImg: {
     width: "100%",
@@ -114,7 +121,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
     borderRadius: 25,
     alignItems: "center",
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: "#000",
     shadowColor: "#000",
     shadowOffset: {

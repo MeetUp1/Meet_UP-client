@@ -11,6 +11,7 @@ import {
   Image,
   TextInput,
   Alert,
+  Platform,
 } from "react-native";
 import { useSelector } from "react-redux";
 
@@ -243,7 +244,9 @@ export default function MeetingInfo() {
             {isRequester ? meeting.requestee.name : meeting.requester.name}
           </Text>
           <Text style={styles.cardText}>
-            {new Date(meeting.startTime).toLocaleString()[20] === "0"
+            {Platform.OS === "android"
+              ? new Date(meeting.startTime).toLocaleString().slice(0, 16)
+              : new Date(meeting.startTime).toLocaleString()[20] === "0"
               ? new Date(meeting.startTime).toLocaleString().slice(0, 21)
               : new Date(meeting.startTime).toLocaleString().slice(0, 20)}
           </Text>
@@ -306,6 +309,7 @@ export default function MeetingInfo() {
                     style={styles.contentInput}
                     onChangeText={setInputRejected}
                     placeholder="거절사유를 입력해주세요"
+                    maxLength={16}
                   />
                 </View>
                 <View style={styles.meetingButtonContainer}>
@@ -427,7 +431,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
     borderRadius: 25,
     alignItems: "center",
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: "#000",
     shadowColor: "#000",
     shadowOffset: {
@@ -450,7 +454,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "column",
     backgroundColor: "#9E7676",
-    width: 320,
+    width: 300,
     padding: 10,
     borderWidth: 2,
     borderRadius: 10,
@@ -503,7 +507,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#9E7676",
     borderColor: "#594545",
     marginTop: 5,
-    width: 300,
+    width: 280,
     height: 70,
     padding: 3,
     borderWidth: 2,
@@ -541,7 +545,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    width: 290,
+    width: "100%",
     height: 30,
     backgroundColor: "#FFF8EA",
   },
