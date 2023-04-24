@@ -137,6 +137,7 @@ export default function Login() {
       <View style={styles.headingContainer}>
         <Animated.Text style={styles.logoText}>Meet-UP</Animated.Text>
         <Animated.Text
+          testID="animated-exclamation"
           style={[
             styles.headingExclamation,
             {

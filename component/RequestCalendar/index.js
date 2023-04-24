@@ -12,113 +12,8 @@ import Animated, {
   runOnJS,
 } from "react-native-reanimated";
 
-const getDaysInMonth = (month, year) => {
-  return new Date(year, month + 1, 0).getDate();
-};
-
-const getFirstDayInMonth = (month, year) => {
-  return new Date(year, month, 1).getDay();
-};
-
-const CalendarHeader = ({ month, year, onPrev, onNext }) => (
-  <View style={styles.header}>
-    <TouchableOpacity onPress={onPrev}>
-      <Text style={styles.headerButton}>Prev</Text>
-    </TouchableOpacity>
-    <Text style={styles.headerText}>{`${year}.${month + 1}`}</Text>
-    <TouchableOpacity onPress={onNext}>
-      <Text style={styles.headerButton}>Next</Text>
-    </TouchableOpacity>
-  </View>
-);
-
-const MonthView = ({
-  month,
-  year,
-  selectedDate,
-  setSelectedDate,
-  selectUserTime,
-}) => {
-  const daysInMonth = getDaysInMonth(month, year);
-  const firstDayInMonth = getFirstDayInMonth(month, year);
-
-  const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const onDayPress = (day) => {
-    setSelectedDate(day);
-  };
-
-  const getMeetingCountForDate = (date) => {
-    return selectUserTime
-      .map((time) => new Date(time))
-      .filter(
-        (time) =>
-          time.getFullYear() === date.getFullYear() &&
-          time.getMonth() === date.getMonth() &&
-          time.getDate() === date.getDate(),
-      ).length;
-  };
-
-  return (
-    <View style={styles.month}>
-      <View style={styles.weekDaysContainer}>
-        {weekDays.map((day, index) => (
-          <View key={`weekday-${index}`} style={styles.weekDay}>
-            <Text style={styles.weekDayText}>{day}</Text>
-          </View>
-        ))}
-      </View>
-      <View style={styles.daysContainer}>
-        {Array(firstDayInMonth)
-          .fill(null)
-          .map((_, index) => (
-            <View key={`empty-${index}`} style={styles.day} />
-          ))}
-        {Array(daysInMonth)
-          .fill(null)
-          .map((_, index) => {
-            const day = new Date(year, month, index + 1);
-            const isToday =
-              day.getFullYear() === today.getFullYear() &&
-              day.getMonth() === today.getMonth() &&
-              day.getDate() === today.getDate();
-            const isSelected =
-              selectedDate && day.getTime() === selectedDate.getTime();
-            const isPastDate = day.getTime() < today.getTime();
-
-            const dayStyle = [
-              styles.day,
-              isToday && styles.today,
-              isSelected && styles.selectedDay,
-            ];
-            const dayTextStyle = isToday
-              ? styles.todayText
-              : isPastDate
-              ? styles.pastDateText
-              : styles.dayText;
-
-            const meetingCount = getMeetingCountForDate(day);
-
-            return (
-              <TouchableOpacity
-                key={`day-${index}`}
-                style={dayStyle}
-                onPress={() => !isPastDate && onDayPress(day)}
-                disabled={isPastDate}
-              >
-                <Text style={dayTextStyle}>{index + 1}</Text>
-                {meetingCount > 0 && (
-                  <Text style={styles.meetingCount}>{meetingCount}</Text>
-                )}
-              </TouchableOpacity>
-            );
-          })}
-      </View>
-    </View>
-  );
-};
+import CalendarHeader from "../CalendarHeader";
+import RequestMonthView from "../RequestMonthview";
 
 export default function RequestCalendar({
   nextStep,
@@ -276,7 +171,7 @@ export default function RequestCalendar({
         <PanGestureHandler onGestureEvent={onGestureEvent}>
           <Animated.View style={animatedStyle}>
             <View style={styles.monthWrapper}>
-              <MonthView
+              <RequestMonthView
                 month={month}
                 year={year}
                 selectedDate={selectedDate}
@@ -395,73 +290,6 @@ const styles = StyleSheet.create({
   marginContainer: {
     marginBottom: 50,
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  headerText: {
-    fontSize: 30,
-    fontFamily: "Jua",
-  },
-  headerButton: {
-    marginRight: 15,
-    marginLeft: 15,
-    fontSize: 20,
-    fontFamily: "Jua",
-  },
-  month: {
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  weekDaysContainer: {
-    flexDirection: "row",
-    width: "100%",
-    paddingHorizontal: 10,
-    marginBottom: 5,
-  },
-  weekDay: {
-    width: "14%",
-  },
-  weekDayText: {
-    fontSize: 17,
-    textAlign: "center",
-    color: "#FFF8EA",
-    fontFamily: "Jua",
-  },
-  daysContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    width: "100%",
-    paddingHorizontal: 10,
-  },
-  day: {
-    width: "14%",
-    aspectRatio: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  dayText: {
-    fontSize: 15,
-    textAlign: "center",
-    color: "#FFF8EA",
-    fontFamily: "Jua",
-  },
-  today: {
-    backgroundColor: "#594545",
-    borderRadius: 50,
-  },
-  todayText: {
-    color: "#FFF8EA",
-    fontFamily: "Jua",
-  },
-  selectedDay: {
-    borderColor: "#594545",
-    borderWidth: 2,
-    borderRadius: 50,
-  },
   monthWrapper: {
     borderWidth: 2,
     borderColor: "black",
@@ -563,22 +391,6 @@ const styles = StyleSheet.create({
   },
   unavailableHourText: {
     color: "#999",
-    fontFamily: "Jua",
-  },
-  meetingCount: {
-    position: "absolute",
-    bottom: 1,
-    right: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    borderRadius: 30,
-    paddingHorizontal: 4,
-    paddingVertical: 2,
-    color: "white",
-    fontSize: 10,
-  },
-  pastDateText: {
-    color: "#A0A0A0",
-    fontSize: 15,
     fontFamily: "Jua",
   },
 });
