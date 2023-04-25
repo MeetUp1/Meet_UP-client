@@ -33,6 +33,7 @@ export default function Header() {
         <View style={[styles.profile, { justifyContent: "flex-end" }]}>
           <View style={styles.profileImgContainer}>
             <Image
+              testID="profileImg"
               source={{
                 uri: currentUser.picture,
               }}
