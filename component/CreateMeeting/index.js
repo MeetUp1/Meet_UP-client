@@ -202,6 +202,7 @@ export default function CreateMeeting() {
             onPress={() => onTimePeriodChange("AM")}
           >
             <Text
+              testID="timePeriodTextAM"
               style={[
                 styles.timePeriodText,
                 timePeriod === "AM" && styles.timePeriodSelectedText,
@@ -219,6 +220,7 @@ export default function CreateMeeting() {
             onPress={() => onTimePeriodChange("PM")}
           >
             <Text
+              testID="timePeriodTextPM"
               style={[
                 styles.timePeriodText,
                 timePeriod === "PM" && styles.timePeriodSelectedText,
@@ -253,6 +255,7 @@ export default function CreateMeeting() {
               return (
                 <TouchableOpacity
                   key={`hour-${index}`}
+                  testID="hour"
                   style={[
                     styles.hour,
                     isSelected && styles.selectedHour,
