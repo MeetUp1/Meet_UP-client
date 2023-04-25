@@ -60,6 +60,7 @@ const CreateMonthView = ({ month, year, selectedDate, setSelectedDate }) => {
                 style={dayStyle}
                 onPress={() => onDayPress(day)}
                 disabled={isPast}
+                testID={isSelected ? "selectedDay" : undefined}
               >
                 <Text style={dayTextStyle}>{index + 1}</Text>
               </TouchableOpacity>
