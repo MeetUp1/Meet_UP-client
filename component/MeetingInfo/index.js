@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import { useSelector } from "react-redux";
 
-import sendNotification from "../../expoPush";
+import sendNotification from "../../features/expoPush";
 
 export default function MeetingInfo() {
   const [activeButton, setActiveButton] = useState(0);
@@ -24,7 +24,6 @@ export default function MeetingInfo() {
   const [inputRejected, setInputRejected] = useState("");
 
   const navigation = useNavigation();
-
   const { currentUser } = useSelector((state) => state);
 
   const navigateToLoginPage = () => {

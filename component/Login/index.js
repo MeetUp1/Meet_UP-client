@@ -24,7 +24,7 @@ import { userLogin, expoToken } from "../../features/reducers/loginSlice";
 
 WebBrowser.maybeCompleteAuthSession();
 
-async function registerForPushNotificationsAsync() {
+export async function registerForPushNotificationsAsync() {
   let token;
   if (Device.isDevice) {
     const { status: existingStatus } =

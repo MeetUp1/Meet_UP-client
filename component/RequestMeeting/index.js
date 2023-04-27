@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { useSelector } from "react-redux";
 
-import sendNotification from "../../expoPush";
+import sendNotification from "../../features/expoPush";
 import RequestCalendar from "../RequestCalendar";
 
 export default function MeetingRequest({ route }) {

@@ -10,7 +10,8 @@
     "lint:fix": "eslint --fix .",
     "prepare": "husky install",
     "pre-commit": "lint-staged",
-    "test": "jest"
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@react-navigation/native": "^6.1.6",
