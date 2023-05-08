@@ -128,7 +128,7 @@ const getMeetingsByDate = (meetingList, month, year) => {
 
 이프로젝트에서는 이방법으로 유저의 지역정보에 따른 Time zone 달라도 나의 로컬시간에 맞게 표시되도록 모든 날짜를 UTC형태로 저장하고 나의 로컬시간에 맞도록 변환 시켜주었습니다.
 
-이미지 추가
+<img width="700" src="https://user-images.githubusercontent.com/107290583/236911449-fa16a702-6691-4178-a02d-3f9b81f6f5d1.png">
 
 <br>
 
@@ -230,6 +230,9 @@ export default sendNotification;
 요청이 성공하면 알림이 보내지고, 실패한 경우 오류를 콘솔에 출력합니다.
 
 ![화면_기록_2023-05-07_오후_12_36_22_AdobeExpress](https://user-images.githubusercontent.com/107290583/236910674-63982618-7d96-473f-be00-d86d50f77bdc.gif)
+
+<br>
+
 <img width="700" src="https://user-images.githubusercontent.com/107290583/236910526-720bd8f0-5e30-48aa-bb72-5e3dc0b035ad.png">
 
 <br>
