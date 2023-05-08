@@ -347,7 +347,7 @@ export default function MeetingInfo() {
               <>
                 <View style={styles.meetingContentContainer}>
                   <Text style={styles.cardText}>거절사유</Text>
-                  <Text style={styles.cardText}>{meeting.message}</Text>
+                  <Text style={styles.inputText}>{meeting.message}</Text>
                 </View>
                 <View style={styles.meetingButtonContainer}>
                   <TouchableOpacity

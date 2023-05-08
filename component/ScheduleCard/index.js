@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     fontFamily: "Jua",
   },
   cardTime: {
-    fontSize: screenWidth * 0.05,
+    fontSize: screenWidth * 0.043,
     color: "#FFF8EA",
     fontFamily: "Jua",
   },

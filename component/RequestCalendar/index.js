@@ -28,6 +28,7 @@ export default function RequestCalendar({
   const [selectedDate, setSelectedDate] = useState(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+
     return today;
   });
   const navigation = useNavigation();
