@@ -229,7 +229,8 @@ export default sendNotification;
 <br>
 요청이 성공하면 알림이 보내지고, 실패한 경우 오류를 콘솔에 출력합니다.
 
-gif와 이미지 추가 예정
+![화면_기록_2023-05-07_오후_12_36_22_AdobeExpress](https://user-images.githubusercontent.com/107290583/236910674-63982618-7d96-473f-be00-d86d50f77bdc.gif)
+<img width="700" src="https://user-images.githubusercontent.com/107290583/236910526-720bd8f0-5e30-48aa-bb72-5e3dc0b035ad.png">
 
 <br>
 
