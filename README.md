@@ -1,5 +1,7 @@
 # 🤝 MeetUP
-
+<p align="center">
+ <img width=300 src="https://github.com/MeetUp1/Meet_UP-client/assets/107290583/e2152e3a-900a-4b93-ac82-62101a277a3a" />
+</p>
 MeetUP 프로젝트는 전 세계의 다양한 지역에서 미팅을 개최하고 참가할 수 있는 Mobile application 입니다.
 
 <br>
