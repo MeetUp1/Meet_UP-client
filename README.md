@@ -98,7 +98,7 @@ Google Calendar API는 다양한 기능을 제공하며, 이를 통해 캘린더
 
 <br>
 
-**대안: 시간 정보의 표준화**
+**대안,시도: 시간 정보의 표준화**
 
 이 문제를 해결하기 위한 대안으로, 사용자가 미팅을 생성하거나 신청할 때 해당 일정의 시간 정보를 UTC (협정 세계시)로 변환하여 저장하는 방법을 생각해 보았습니다. 이를 통해 다양한 지역에서 사용하는 사용자들의 일정 시간을 표준화하고, 사용자 간의 시간 차이를 고려할 수 있습니다. 이렇게 통일화된 UTC를 DB에 저장해 주었습니다.
 
@@ -110,7 +110,7 @@ const convertToUTCDate = (localDate, hour) => {
 };
 ```
 
-위의 함수를 사용하여, 주어진 로컬 날짜와 시간을 UTC 형태의 시간으로 변환하는 시도를 하였습니다.
+위의 함수를 사용하여, 주어진 로컬 날짜와 시간을 UTC 형태의 시간으로 변환하는 함수를 만들어 주었습니다.
 
 <br>
 이 함수는 주어진 로컬 날짜`localDate`와 시간`hour`을 기반으로 해당 시간의 UTC 날짜 문자열을 반환합니다.
@@ -330,17 +330,23 @@ export async function registerForPushNotificationsAsync() {
 
 이함수는 현재 프로젝트에서 expo push 알림 토큰을 얻기위해 사용된 함수 입니다. 함수는 설명은 다음과 같습니다.
 <br>
-`Device.isDevice`를 사용하여 현재 기기가 실제 기기인지 확인합니다. 시뮬레이터에서는 푸시 알림을 사용할 수 없습니다.
-<br>
-`Notifications.getPermissionsAsync()`를 사용하여 앱에 이미 푸시 알림 권한이 부여되어 있는지 확인합니다.
-<br>
-권한이 없다면, `Notifications.requestPermissionsAsync()`를 사용하여 사용자에게 푸시 알림 권한을 요청합니다.
-<br>
-사용자가 권한을 허용하면, `Notifications.getExpoPushTokenAsync()`를 사용하여 Expo 푸시 토큰을 가져옵니다.
-<br>
-안드로이드 플랫폼의 경우, `Notifications.setNotificationChannelAsync()`를 사용하여 푸시 알림 채널을 설정합니다. 이 설정은 중요도, 진동 패턴 및 알림 LED 색상을 포함합니다.
-<br>
-마지막으로, 생성된 토큰을 반환합니다. 이렇게 반환된 토큰을 서버에 저장해 주었습니다.
+
+1. `Device.isDevice`를 사용하여 현재 기기가 실제 기기인지 확인합니다. 시뮬레이터에서는 푸시 알림을 사용할 수 없습니다.
+   <br>
+
+2. `Notifications.getPermissionsAsync()`를 사용하여 앱에 이미 푸시 알림 권한이 부여되어 있는지 확인합니다.
+   <br>
+
+3. 권한이 없다면, `Notifications.requestPermissionsAsync()`를 사용하여 사용자에게 푸시 알림 권한을 요청합니다.
+   <br>
+
+4. 사용자가 권한을 허용하면, `Notifications.getExpoPushTokenAsync()`를 사용하여 Expo 푸시 토큰을 가져옵니다.
+   <br>
+
+5. 안드로이드 플랫폼의 경우, `Notifications.setNotificationChannelAsync()`를 사용하여 푸시 알림 채널을 설정합니다. 이 설정은 중요도, 진동 패턴 및 알림 LED 색상을 포함합니다.
+   <br>
+
+6. 마지막으로, 생성된 토큰을 반환합니다. 이렇게 반환된 토큰을 서버에 저장해 주었습니다.
 
 <br>
 
