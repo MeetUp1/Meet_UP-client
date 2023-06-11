@@ -271,7 +271,7 @@ const isMinutesPast = (meetingStartTime, minutes) => {
 이러한 방법으로 true 경우 완료버튼을 나타나게 해주고 false라면 완료버튼이 보이지 않도록 해주었습니다.
 <br>
 
-<img width="500" alt="스크린샷 2023-06-07 오후 7 05 19" src="https://github.com/MeetUp1/Meet_UP-client/assets/107290583/4024244e-1f58-4154-a0f3-92e1da5657d8">
+<img width="400" alt="스크린샷 2023-06-12 오전 2 05 19" src="https://github.com/MeetUp1/Meet_UP-client/assets/107290583/d3da3ab8-9358-4c64-8380-13f46d1bf9f3">
 
 위 이미지 처럼 현재 시간보다 미팅시작 시간이 특정시간 만큼 지났으면 완료버튼이 나오도록 해주었습니다.
 
@@ -602,18 +602,25 @@ useFocusEffect(
 
 ### Frontend
 
-- expo
-- react-navigation
-- react-redux
-- ESLint
+- **expo**
+  - React Native를 이용한 크로스 플랫폼 앱 개발을 쉽게 하고, 네이티브 코드 작성 없이도 다양한 네이티브 API를 사용할 수 있기 때문에 expo를 사용했습니다.
+- **react-navigation**
+  - 애플리케이션 내의 화면 전환을 쉽고 직관적으로 관리하면서, 다양한 네비게이션 패턴을 효과적으로 구현하기 위해 사용했습니다.
+- **react-redux**
+  - 전체 애플리케이션의 상태를 효과적으로 관리하고, 컴포넌트 간의 상태 공유를 간소화하기 위해 사용했습니다.
+- **ESLint**
+  - 일관된 코딩 스타일을 유지하며, 버그와 문제를 미리 발견하고 방지하기위해 사용했습니다.
 
 ### Backend
 
-- [Node.js](https://nodejs.org/ko/)
-- [Express](https://expressjs.com/ko/)
-- [MongoDB](https://www.mongodb.com/cloud/atlas/register)
-- [Mongoose](https://mongoosejs.com/)
-- ESLint
+- **Node.js**
+- **Express**
+  - Node.js 기반의 웹 애플리케이션 백엔드를 쉽게 구축하고, 라우팅, 미들웨어 설정 등의 복잡한 과정을 간소화하면서, 확장성과 유연성을 유지하기 사용했습니다.
+- **MongoDB**
+  - 데이터를 저장하고 처리하는데 유용한 NoSQL 데이터베이스로, 스키마리스한 특성을 가지며 확장성과 유연성을 제공하고, JSON 형식의 데이터를 쉽게 저장하고 검색할 수 있기 때문에 사용하였습니다.
+- **axios**
+  - 웹 브라우저와 Node.js 양측에서 작동하는 효율적인 HTTP 클라이언트 라이브러리이며, fetch에 비해 HTTP 요청을 취소하는 기능, 요청과 응답 데이터를 자동으로 JSON 형식으로 변환하는 기능, 네트워크 에러나 요청 시간 초과 등의 경우에 요청을 자동으로 재시도하는 기능 등의 추가적인 기능들을 제공하기 때문에 사용했습니다.
+- **ESLint**
 
 <br>
 
