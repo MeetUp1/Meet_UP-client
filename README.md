@@ -489,14 +489,14 @@ return (
 
 ### 3) 애니메이션을 실행하면서 어떻게 상태를 업데이트 해야할까?
 
-이번 프로젝트를 진행하면서 모바일 앱이라는 특성으로 캘린더를 슬라이드 하면 이전달 다음달로 넘어가는 애니메이션을 구현중에 문제가 발생했습니다. 슬라이드 했을때 부자연 스럽게 다음달 혹은 이전달로 넘어가거나 오류가 발생하는 부분이였습니다. 이문제를 해결하기 위해서 React Native의 애니메이션 상태를 확인해 보았습니다.
+이번 프로젝트를 진행하면서 캘린더를 슬라이드 하면 이전달 다음달로 넘어가는 애니메이션등 애니메이션이 동작하면서 상태가 바뀌는 부분에서 문제가 발생했습니다. 슬라이드 했을때 병목현상으로 애니메이션이 부자연스럽게 실행되었습니다 이문제를 해결하기 위해서 React Native의 애니메이션이 어떻게 실행되는지 조사하고 해결하였습니다.
 
 React Native의 애니메이션 상태를 알아보기 위해서는 React Native의 UI 스레드와 JS 스레드 알고 넘어가야 합니다.
 애플리케이션이 시작되면 시스템은 메인 스레드라고 하는 애플리케이션 실행 스레드를 생성합니다. 이 스레드는 그리기 이벤트를 포함하여 적절한 사용자 인터페이스 위젯에 이벤트를 디스패치하는 역할을 담당합니다.
 
 React-Native 앱이 부팅될 때마다 자바스크립트 코드를 처리하기 위한 스레드가 생성됩니다. 이 스레드에는 자바스크립트 코드를 실행하기 위한 자바스크립트 가상 머신이 포함되어 있으며 이 스레드를 JS 스레드라고 합니다.
 
-UI 또는 해당 속성에 대해 작업을 수행해야 할 때마다 UI 스레드 에서 작업을 수행해야 합니다 . 따라서 JS 스레드는 JSON 메시지를 UI 스레드 로 보내고 UI 에서 필요한 변경을 수행합니다 .
+UI 또는 해당 속성에 대해 작업을 수행해야 할 때마다 UI 스레드 에서 작업을 수행해야 합니다 . 따라서 JS 스레드는 JSON 메시지를 UI 스레드 로 보내고 UI 에서 필요한 변경을 수행합니다.
 
 UI 스레드 와 JS 스레드 간의 통신은 브리지에 의해 수행되며 본질적으로 완전히 비동기적입니다.
 
@@ -506,12 +506,11 @@ React Native에서 애니메이션을 적용하려면 뷰에 애니메이션을 
 
 useNativeDriver를 true로 설정하면 React Native는 JS 스레드에서 UI로 애니메이션을 시작하기만 하고 애니메이션 값 업데이트를 포함한 모든 애니메이션 계산은 네이티브 측에서 수행됩니다. 즉 애니메이션 연산이 JS 스레드가 아닌 네이티브 스레드에서 직접 수행하여. JavaScript 스레드가 블로킹되거나, 느려질 때 애니메이션 성능에 영향을 주는 것을 방지하여 애니메이션의 성능을 향상시킵니다.
 
-useNativeDriver가 false로 설정되면 react-native는 JS 스레드의 모든 것을 계산하고 여러 메시지를 기본으로 보내 애니메이션 값과 UI를 업데이트합니다.(기본값)
-
 <img width="700" src="https://github.com/MeetUp1/Meet_UP-client/assets/107290583/807ff041-7e00-4e7e-94b6-51d2c9b613e0">
 
-하지만 이러한 장점들도 있지만 단점도 있습니다. 이러한 단점으로 인해 저는 제프로젝트에 이러한 문제가 발생했습니다.
-스레드가 많은 메시지로 막히면 애니메이션이 제때 시작되지 않아 지연이 발생하였습니다. 하지만 애니메이션은 사용자 상호 작용의 중요한 부분이기 때문에 매끄러워야 하기때문에 Reanimated 2 라이브러리를 사용하여 문제를 해결 하였습니다.
+스레드가 많은 메시지로 막히면 애니메이션이 제때 시작되지 않아 지연이 발생하였습니다. 하지만 애니메이션은 사용자 상호 작용의 중요한 부분이기 때문에 매끄러워야 하기때문에 해결방법으로 React Native에서 기본적으로 제공하는 Animated의 useNativeDriver의 활성화하는 방법과 Reanimated 2 라이브러리를 사용하는 방법중 고민하였습니다.
+
+Animated의 useNativeDriver와 Reanimated 2 모두 애니메이션을 js 스레드 에서 UI스레드로 분리시켜 사용할 수 있지만 Animated의 useNativeDriver는 일부 애니메이션 (transform과 opacity 등)을 UI 스레드에서 직접 처리할 수 있도록 직렬화된 애니메이션 설정을 JavaScript 스레드에서 네이티브 스레드로 전달합니다. 이 방법은 애니메이션의 부드러움을 향상시키지만, JavaScript 스레드와 네이티브 스레드 간의 통신 병목 현상을 완전히 제거하지 못하는 문제가 있습니다. 하지만 Reanimated는 JSI를 사용하여 JavaScript와 네이티브 코드 간의 통신을 최소화하고 애니메이션 성능을 향상시킵니다. JSI로 인해 JavaScript 코드가 네이티브 함수를 직접 호출할 수 있게 하며, 반대로 네이티브 코드가 JavaScript 함수를 호출할 수 있게 합니다. 즉 Reanimated가 Animated의 useNativeDriver 옵션보다 더 많은 애니메이션 유형과 복잡한 애니메이션 로직을 부드럽게 지원 할수 있으므로 Reanimated를 사용하였습니다.
 
 Reanimated 2는 UI 스레드에 존재하는 스레드를 생성합니다. 이 스레드에는 작은 자바스크립트 코드 조각이 포함되어 있으며 JSI의 도움으로 UI 스레드와 직접 동기적으로 통신하여 UI를 애니메이션할 수 있습니다. Reanimated 2 스레드와 메인 JS 스레드 간의 통신도 JSI로 이루어집니다.
 
@@ -521,48 +520,11 @@ Reanimated 2는 UI 스레드에 존재하는 스레드를 생성합니다. 이 �
 
 <img width="500" src="https://github.com/MeetUp1/Meet_UP-client/assets/107290583/d2139ca7-e8d3-45b9-8eac-3097aa92662b">
 
-마지막으로 애니메이션이 종료된후 날짜의 상태와 데이터를 업데이트 해야하는데 상태 업데이트는 기본 JS 스레드에서만 수행할 수 있습니다. 하지만 Reanimated 2의 runOnJS로 JS 스레드의 함수 호출을 큐에 넣을 수 있습니다. 따라서 runOnJS로 UI 스레드와 JavaScript 스레드 사이에서 동기화 문제를 해결하였습니다.
-
-<img width="700" src="https://github.com/MeetUp1/Meet_UP-client/assets/107290583/41186e8a-fa07-4340-a808-37d14fc3a396">
-
-```javascript
-<Animated.View style={animatedStyle}>
-  <View style={styles.monthWrapper}>
-    <CreateMonthView
-      month={month}
-      year={year}
-      selectedDate={selectedDate}
-      setSelectedDate={setSelectedDate}
-    />
-  </View>
-</Animated.View>;
-
-const onPrevMonth = () => {
-  const newDate = new Date(year, month - 1, 1);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  runOnJS(setDate)(newDate);
-
-  if (
-    today.getMonth() === newDate.getMonth() &&
-    today.getFullYear() === newDate.getFullYear()
-  ) {
-    runOnJS(setSelectedDate)(today);
-  } else {
-    newDate.setHours(0, 0, 0, 0);
-    runOnJS(setSelectedDate)(newDate);
-  }
-};
-```
-
-위코드드는 현재 프로젝트 에서 사용된 코드 입니다. 이처럼 애니메이션이 실행하면서 정상적으로 상태가 업데이트 되지않는 문제를 reanimated로 문제를 해결하였습니다.
+<br>
 
 ![화면_기록_2023-06-07_오전_10_14_21_AdobeExpress](https://github.com/MeetUp1/Meet_UP-client/assets/107290583/2e1f451e-4d36-49b8-b41e-2d29d3816ec7)
 
-위와같이 화면을 슬라이드애니메이션을 진행하며 함수가 동작하게 프로그램을 작성해주었습니다.
-
-<br>
+위와같이 Reanimated를 이용하여 상태업데이트가 되au 화면을 슬라이드애니메이션을 진행할때 병목현상으로 애니메이션이 부자연스럽게 실행되는것을 해결하여 주었습니다.
 
 ### 4) React Native에서의 플랫폼 간의 차이
 
