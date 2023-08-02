@@ -9,9 +9,20 @@ import MeetingSchedule from "../MeetingSchedule";
 import MeetingRequest from "../RequestMeeting";
 import ErrorPage from "../error";
 
-const Stack = createStackNavigator();
+type EmptyProps = object;
 
-export default function Root() {
+type RootStackParamList = {
+  Login: EmptyProps;
+  CreateMeeting: EmptyProps;
+  MeetingInfo: EmptyProps;
+  MeetingSchedule: EmptyProps;
+  MeetingRequest: EmptyProps;
+  ErrorPage: EmptyProps;
+};
+
+const Stack = createStackNavigator<RootStackParamList>();
+
+const Root = () => {
   return (
     <Stack.Navigator
       initialRouteName="Login"
@@ -35,4 +46,6 @@ export default function Root() {
       />
     </Stack.Navigator>
   );
-}
+};
+
+export default Root;

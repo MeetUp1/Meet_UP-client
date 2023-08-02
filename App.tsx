@@ -5,29 +5,35 @@ import React, { useState, useEffect } from "react";
 import { Provider } from "react-redux";
 
 import animation from "./assets/animation.json/meeting-and-stuff.json";
-import Root from "./component/App";
+import Root from "./component/App/index";
+import { COLOR_BEIGE } from "./constants/color";
+import { LOADING_ANIMATION_DELAY } from "./constants/timings";
 import store from "./store/configureStore";
 
-async function loadFonts() {
-  await Font.loadAsync({
-    GamjaFlower: require("./assets/fonts/GamjaFlower-Regular.ttf"),
-    Jua: require("./assets/fonts/Jua-Regular.ttf"),
-  });
+async function loadFonts(): Promise<void> {
+  try {
+    await Font.loadAsync({
+      GamjaFlower: require("./assets/fonts/GamjaFlower-Regular.ttf"),
+      Jua: require("./assets/fonts/Jua-Regular.ttf"),
+    });
+  } catch (e: any) {
+    console.warn(e);
+  }
 }
 
-export default function App() {
+const App = () => {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     async function prepare() {
       try {
         await loadFonts();
-      } catch (e) {
+      } catch (e: any) {
         console.warn(e);
       } finally {
         setTimeout(() => {
           setIsReady(true);
-        }, 4000);
+        }, LOADING_ANIMATION_DELAY);
       }
     }
 
@@ -40,7 +46,7 @@ export default function App() {
         source={animation}
         autoPlay
         loop
-        style={{ flex: 1, backgroundColor: "#FFF8EA" }}
+        style={{ flex: 1, backgroundColor: COLOR_BEIGE }}
       />
     );
   }
@@ -52,4 +58,6 @@ export default function App() {
       </NavigationContainer>
     </Provider>
   );
-}
+};
+
+export default App;
