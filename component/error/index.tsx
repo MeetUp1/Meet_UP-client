@@ -1,13 +1,23 @@
 import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
+import { COLOR_BROWN, COLOR_BEIGE } from "../../constants/color";
+
+type RootStackParamList = {
+  ErrorPage: undefined;
+  Login: undefined;
+};
+
 const ErrorPage = () => {
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<StackNavigationProp<RootStackParamList, "ErrorPage">>();
 
   const navigateToLoginPage = () => {
     navigation.navigate("Login");
   };
+
   return (
     <View style={styles.container}>
       <Text style={styles.errorText}>⚠️에러가 발생했습니다</Text>
@@ -26,7 +36,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFF8EA",
+    backgroundColor: COLOR_BEIGE,
   },
   errorText: {
     fontSize: 30,
@@ -34,14 +44,14 @@ const styles = StyleSheet.create({
     fontFamily: "Jua",
   },
   retryButton: {
-    backgroundColor: "#9E7676",
+    backgroundColor: COLOR_BROWN,
     marginTop: 30,
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 5,
   },
   retryText: {
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontSize: 18,
     fontFamily: "Jua",
   },
