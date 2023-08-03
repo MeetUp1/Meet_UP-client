@@ -1,7 +1,9 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-const initialState = {
-  currentUser: {},
+import { User, LoginState } from "../../store/types";
+
+const initialState: LoginState = {
+  currentUser: null,
   expoPushToken: "",
 };
 
@@ -9,10 +11,10 @@ const loginSlice = createSlice({
   name: "login",
   initialState,
   reducers: {
-    userLogin: (state, action) => {
+    userLogin: (state, action: PayloadAction<User>) => {
       state.currentUser = action.payload;
     },
-    expoToken: (state, action) => {
+    expoToken: (state, action: PayloadAction<string>) => {
       state.expoPushToken = action.payload;
     },
   },

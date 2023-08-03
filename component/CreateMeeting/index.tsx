@@ -1,5 +1,6 @@
 import { LOGIN_API_URL } from "@env";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
 import axios from "axios";
 import React, { useState, useCallback } from "react";
 import {
@@ -19,26 +20,40 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSelector } from "react-redux";
 
+import {
+  COLOR_BEIGE,
+  COLOR_BROWN,
+  COLOR_LIGHTBROWN,
+} from "../../constants/color";
+import { LoginState } from "../../store/types";
 import CalendarHeader from "../CalendarHeader";
 import CreateMonthView from "../CreateMonthView";
 
 export default function CreateMeeting() {
-  const [date, setDate] = useState(new Date());
-  const [timePeriod, setTimePeriod] = useState("AM");
-  const [completeTime, setCompleteTime] = useState([]);
-  const [selectedDateTime, setSelectedDateTime] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(() => {
+  type RootStackParamList = {
+    ErrorPage: undefined;
+    MeetingSchedule: {
+      showSnackbar: boolean;
+      text: string;
+    };
+  };
+  type NavigationProp = StackNavigationProp<RootStackParamList>;
+  const [date, setDate] = useState<Date>(new Date());
+  const [timePeriod, setTimePeriod] = useState<string>("AM");
+  const [completeTime, setCompleteTime] = useState<string[]>([]);
+  const [selectedDateTime, setSelectedDateTime] = useState<string[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date>(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return today;
   });
 
-  const { currentUser } = useSelector((state) => state);
+  const { currentUser } = useSelector((state: LoginState) => state);
 
   const month = date.getMonth();
   const year = date.getFullYear();
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
 
   const now = new Date();
   const currentHour = now.getHours();
@@ -48,6 +63,11 @@ export default function CreateMeeting() {
   };
 
   const handleMeetingSchedule = async () => {
+    if (!currentUser) {
+      navigateToLoginPage();
+      return;
+    }
+
     navigation.navigate("MeetingSchedule", {
       showSnackbar: true,
       text: "미팅일정등록이 완료 되었습니다.",
@@ -57,6 +77,7 @@ export default function CreateMeeting() {
         selectedDateTime,
       });
     } catch (error) {
+      console.error(error);
       navigateToLoginPage();
     }
   };
@@ -97,11 +118,11 @@ export default function CreateMeeting() {
     }
   };
 
-  const onTimePeriodChange = (period) => {
+  const onTimePeriodChange = (period: string) => {
     setTimePeriod(period);
   };
 
-  const onHourSelect = (day, hour) => {
+  const onHourSelect = (day: Date, hour: number) => {
     const dateTime = new Date(day);
     dateTime.setHours(hour, 0, 0, 0);
 
@@ -135,7 +156,7 @@ export default function CreateMeeting() {
     },
   });
 
-  const isCompleteTime = (day, hour) => {
+  const isCompleteTime = (day: Date, hour: number) => {
     return completeTime.some((dateTime) => {
       const complete = new Date(dateTime);
       return (
@@ -157,6 +178,10 @@ export default function CreateMeeting() {
   useFocusEffect(
     useCallback(() => {
       async function fetchData() {
+        if (!currentUser) {
+          navigateToLoginPage();
+          return;
+        }
         const response = await axios.get(
           `${LOGIN_API_URL}/api/users/${currentUser.id}`,
         );
@@ -166,7 +191,7 @@ export default function CreateMeeting() {
         setSelectedDateTime(openTime);
       }
       fetchData();
-    }, [currentUser.id]),
+    }, [currentUser]),
   );
 
   return (
@@ -294,11 +319,11 @@ export default function CreateMeeting() {
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    backgroundColor: "#FFF8EA",
+    backgroundColor: COLOR_BEIGE,
     flex: 1,
   },
   container: {
-    backgroundColor: "#FFF8EA",
+    backgroundColor: COLOR_BEIGE,
     alignItems: "center",
     marginTop: 20,
   },
@@ -314,7 +339,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     width: "90%",
-    backgroundColor: "#9E7676",
+    backgroundColor: COLOR_BROWN,
   },
   timePeriodContainer: {
     flexDirection: "row",
@@ -326,7 +351,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 25,
     marginHorizontal: 10,
-    backgroundColor: "#9E7676",
+    backgroundColor: COLOR_BROWN,
     width: "22%",
     marginRight: 5,
     alignItems: "center",
@@ -342,14 +367,14 @@ const styles = StyleSheet.create({
   },
   timePeriodText: {
     fontSize: 20,
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   timePeriodSelected: {
-    backgroundColor: "#594545",
+    backgroundColor: COLOR_LIGHTBROWN,
   },
   timePeriodSelectedText: {
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   hoursContainer: {
@@ -373,15 +398,15 @@ const styles = StyleSheet.create({
     fontFamily: "Jua",
   },
   selectedHour: {
-    backgroundColor: "#9E7676",
+    backgroundColor: COLOR_BROWN,
   },
   selectedHourText: {
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   button: {
     alignItems: "center",
-    backgroundColor: "#9E7676",
+    backgroundColor: COLOR_BROWN,
     padding: 10,
     width: "35%",
     marginBottom: 50,
@@ -398,14 +423,14 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 22,
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   disabledHour: {
-    backgroundColor: "#594545",
+    backgroundColor: COLOR_LIGHTBROWN,
   },
   disabledHourText: {
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
 });
