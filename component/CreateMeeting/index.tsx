@@ -38,6 +38,7 @@ export default function CreateMeeting() {
     };
   };
   type NavigationProp = StackNavigationProp<RootStackParamList>;
+
   const [date, setDate] = useState<Date>(new Date());
   const [timePeriod, setTimePeriod] = useState<string>("AM");
   const [completeTime, setCompleteTime] = useState<string[]>([]);

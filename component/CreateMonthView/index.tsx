@@ -1,8 +1,27 @@
+import React from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 
+import {
+  COLOR_BEIGE,
+  COLOR_BROWN,
+  COLOR_LIGHTBROWN,
+  COLOR_GRAY,
+} from "../../constants/color";
 import { getDaysInMonth, getFirstDayInMonth } from "../../features/utils";
 
-const CreateMonthView = ({ month, year, selectedDate, setSelectedDate }) => {
+interface CreateMonthViewProps {
+  month: number;
+  year: number;
+  selectedDate: Date;
+  setSelectedDate: (date: Date) => void;
+}
+
+const CreateMonthView = ({
+  month,
+  year,
+  selectedDate,
+  setSelectedDate,
+}: CreateMonthViewProps) => {
   const daysInMonth = getDaysInMonth(month, year);
   const firstDayInMonth = getFirstDayInMonth(month, year);
 
@@ -10,7 +29,7 @@ const CreateMonthView = ({ month, year, selectedDate, setSelectedDate }) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const onDayPress = (day) => {
+  const onDayPress = (day: Date) => {
     const currentDay = new Date();
     currentDay.setHours(0, 0, 0, 0);
     if (day >= currentDay) {
@@ -31,7 +50,7 @@ const CreateMonthView = ({ month, year, selectedDate, setSelectedDate }) => {
         {Array(firstDayInMonth)
           .fill(null)
           .map((_, index) => (
-            <View key={`empty-${index}`} style={styles.day} />
+            <View key={`day-${index}`} style={styles.day} />
           ))}
         {Array(daysInMonth)
           .fill(null)
@@ -90,7 +109,7 @@ const styles = StyleSheet.create({
   weekDayText: {
     fontSize: 17,
     textAlign: "center",
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   daysContainer: {
@@ -109,27 +128,27 @@ const styles = StyleSheet.create({
   dayText: {
     fontSize: 15,
     textAlign: "center",
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   today: {
-    backgroundColor: "#594545",
+    backgroundColor: COLOR_LIGHTBROWN,
     borderRadius: 50,
   },
   todayText: {
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   selectedDay: {
-    borderColor: "#594545",
+    borderColor: COLOR_LIGHTBROWN,
     borderWidth: 2,
     borderRadius: 50,
   },
   pastDay: {
-    backgroundColor: "#9E7676",
+    backgroundColor: COLOR_BROWN,
   },
   pastDayText: {
-    color: "#A0A0A0",
+    color: COLOR_GRAY,
     fontSize: 15,
     fontFamily: "Jua",
   },

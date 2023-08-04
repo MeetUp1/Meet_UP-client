@@ -1,4 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
 import React from "react";
 import {
   StyleSheet,
@@ -10,9 +11,24 @@ import {
 } from "react-native";
 import { useSelector } from "react-redux";
 
+import {
+  COLOR_BEIGE,
+  COLOR_BROWN,
+  COLOR_LIGHTGRAY,
+} from "../../constants/color";
+import { LoginState } from "../../store/types";
+
 export default function Header() {
-  const navigation = useNavigation();
-  const { currentUser } = useSelector((state) => state);
+  type RootStackParamList = {
+    CreateMeeting: undefined;
+    MeetingInfo: undefined;
+    MeetingSchedule: undefined;
+    MeetingRequest: undefined;
+  };
+  type NavigationProp = StackNavigationProp<RootStackParamList>;
+
+  const navigation = useNavigation<NavigationProp>();
+  const { currentUser } = useSelector((state: LoginState) => state);
 
   const handleCreateMeeting = () => {
     navigation.navigate("CreateMeeting");
@@ -32,17 +48,21 @@ export default function Header() {
         <Text style={styles.headerTitle}>Meet-UP!</Text>
         <View style={[styles.profile, { justifyContent: "flex-end" }]}>
           <View style={styles.profileImgContainer}>
-            <Image
-              testID="profileImg"
-              source={{
-                uri: currentUser.picture,
-              }}
-              style={styles.profileImg}
-            />
+            {currentUser && (
+              <Image
+                testID="profileImg"
+                source={{
+                  uri: currentUser.picture,
+                }}
+                style={styles.profileImg}
+              />
+            )}
           </View>
-          <Text style={styles.profileText}>
-            {currentUser.name}님 안녕하세요
-          </Text>
+          {currentUser && (
+            <Text style={styles.profileText}>
+              {currentUser.name}님 안녕하세요
+            </Text>
+          )}
         </View>
       </View>
       <View style={styles.buttonContainer}>
@@ -68,7 +88,7 @@ const { width: screenWidth } = Dimensions.get("window");
 const styles = StyleSheet.create({
   container: {
     marginTop: 50,
-    backgroundColor: "#FFF8EA",
+    backgroundColor: COLOR_BEIGE,
     alignItems: "center",
   },
   header: {
@@ -78,11 +98,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#CCC",
+    borderBottomColor: COLOR_LIGHTGRAY,
   },
   headerTitle: {
     width: "50%",
-    color: "#9E7676",
+    color: COLOR_BROWN,
     textShadowColor: "rgba(0, 0, 0, 1)",
     textShadowOffset: { width: 1, height: 2 },
     textShadowRadius: 1,
@@ -116,7 +136,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   button: {
-    backgroundColor: "#9E7676",
+    backgroundColor: COLOR_BROWN,
     padding: 10,
     width: "22%",
     marginRight: 5,
@@ -133,7 +153,7 @@ const styles = StyleSheet.create({
     shadowRadius: 1,
   },
   buttonText: {
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontSize: 14,
     fontFamily: "Jua",
   },
