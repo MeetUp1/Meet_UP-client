@@ -5,6 +5,7 @@ import {
   ANDROID_CLIENT_ID,
 } from "@env";
 import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
 import axios from "axios";
 import * as Google from "expo-auth-session/providers/google";
 import * as Device from "expo-device";
@@ -20,12 +21,13 @@ import {
 } from "react-native";
 import { useDispatch } from "react-redux";
 
+import { COLOR_BEIGE, COLOR_BROWN, COLOR_RED } from "../../constants/color";
 import { userLogin, expoToken } from "../../features/reducers/loginSlice";
 
 WebBrowser.maybeCompleteAuthSession();
 
 export async function registerForPushNotificationsAsync() {
-  let token;
+  let token: string;
   if (Device.isDevice) {
     const { status: existingStatus } =
       await Notifications.getPermissionsAsync();
@@ -41,6 +43,7 @@ export async function registerForPushNotificationsAsync() {
     token = (await Notifications.getExpoPushTokenAsync()).data;
   } else {
     alert("Must use physical device for Push Notifications");
+    return;
   }
 
   if (Platform.OS === "android") {
@@ -48,7 +51,7 @@ export async function registerForPushNotificationsAsync() {
       name: "default",
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
-      lightColor: "#FF231F7C",
+      lightColor: COLOR_RED,
     });
   }
 
@@ -56,17 +59,25 @@ export async function registerForPushNotificationsAsync() {
 }
 
 export default function Login() {
-  const [animatedValue, setAnimatedValue] = useState(new Animated.Value(0));
-  const [token, setToken] = useState(null);
+  type RootStackParamList = {
+    ErrorPage: undefined;
+    MeetingSchedule: undefined;
+  };
+  type NavigationProp = StackNavigationProp<RootStackParamList>;
+
+  const [animatedValue, setAnimatedValue] = useState<Animated.Value>(
+    new Animated.Value(0),
+  );
+  const [token, setToken] = useState<string | null>(null);
 
   const dispatch = useDispatch();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     clientId: CLIENT_ID,
     iosClientId: IOS_CLIENT_ID,
     androidClientId: ANDROID_CLIENT_ID,
-    prompt: "select_account",
+    prompt: "select_account" as any,
   });
 
   const navigateToLoginPage = () => {
@@ -74,7 +85,7 @@ export default function Login() {
   };
 
   useEffect(() => {
-    if (response?.type === "success") {
+    if (response?.type === "success" && response.authentication) {
       setToken(response.authentication.accessToken);
       getUserInfo();
     }
@@ -97,7 +108,9 @@ export default function Login() {
 
       if (user) {
         const expoPushToken = await registerForPushNotificationsAsync();
-        dispatch(expoToken(expoPushToken));
+        if (expoPushToken) {
+          dispatch(expoToken(expoPushToken));
+        }
         dispatch(userLogin(user));
         const postRequest = await axios.post(
           `${LOGIN_API_URL}/api/users/login`,
@@ -113,6 +126,7 @@ export default function Login() {
         }
       }
     } catch (error) {
+      console.error(error);
       navigateToLoginPage();
     }
   };
@@ -169,7 +183,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFF8EA",
+    backgroundColor: COLOR_BEIGE,
   },
   headingContainer: {
     flexDirection: "row",
@@ -179,7 +193,7 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: 80,
     fontFamily: "GamjaFlower",
-    color: "#9E7676",
+    color: COLOR_BROWN,
     textShadowColor: "rgba(0, 0, 0, 0.75)",
     textShadowOffset: { width: 1, height: 3 },
     textShadowRadius: 1,
@@ -187,14 +201,14 @@ const styles = StyleSheet.create({
   headingExclamation: {
     fontSize: 80,
     fontFamily: "GamjaFlower",
-    color: "#9E7676",
+    color: COLOR_BROWN,
   },
   button: {
     alignItems: "center",
     justifyContent: "center",
     width: 150,
     height: 60,
-    backgroundColor: "#9E7676",
+    backgroundColor: COLOR_BROWN,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 20,
@@ -209,7 +223,7 @@ const styles = StyleSheet.create({
     shadowRadius: 1,
   },
   buttonText: {
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontSize: 20,
     fontFamily: "Jua",
   },

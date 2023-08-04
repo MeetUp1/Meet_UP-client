@@ -1,5 +1,6 @@
 import { LOGIN_API_URL } from "@env";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
 import axios from "axios";
 import React, { useState, useCallback } from "react";
 import {
@@ -15,35 +16,81 @@ import {
 } from "react-native";
 import { useSelector } from "react-redux";
 
+import {
+  COLOR_BEIGE,
+  COLOR_BROWN,
+  COLOR_LIGHTBROWN,
+  COLOR_MAHOGANYBROWN,
+} from "../../constants/color";
 import sendNotification from "../../features/expoPush";
+import { LoginState } from "../../store/types";
 
 export default function MeetingInfo() {
-  const [activeButton, setActiveButton] = useState(0);
-  const [expandedCards, setExpandedCards] = useState([]);
-  const [meetingList, setMeetingList] = useState([]);
-  const [inputRejected, setInputRejected] = useState("");
+  type RootStackParamList = {
+    ErrorPage: undefined;
+    MeetingRequest: {
+      initialStep: number;
+      userinfo: object;
+    };
+  };
+  type NavigationProp = StackNavigationProp<RootStackParamList>;
+  type User = {
+    email: string;
+    family_name: string;
+    given_name: string;
+    id: string;
+    locale: string;
+    name: string;
+    picture: string;
+    verified_email: boolean;
+    expoPushToken?: string;
+    __v?: number;
+    _id?: string;
+    openTime?: Date[];
+    reservationTime?: Date[];
+  };
+  type Meeting = {
+    __v: number;
+    _id: string;
+    location: string;
+    requestee: User;
+    requester: User;
+    startTime: Date;
+    status: string;
+    title: string;
+    message?: string;
+  };
 
-  const navigation = useNavigation();
-  const { currentUser } = useSelector((state) => state);
+  const [activeButton, setActiveButton] = useState<number>(0);
+  const [expandedCards, setExpandedCards] = useState<(boolean | number)[]>([]);
+  const [meetingList, setMeetingList] = useState<Meeting[]>([]);
+  const [inputRejected, setInputRejected] = useState<string>("");
+
+  const navigation = useNavigation<NavigationProp>();
+  const { currentUser } = useSelector((state: LoginState) => state);
 
   const navigateToLoginPage = () => {
     navigation.navigate("ErrorPage");
   };
 
   const fetchData = useCallback(async () => {
+    if (!currentUser) {
+      navigateToLoginPage();
+      return;
+    }
     const response = await axios.get(
       `${LOGIN_API_URL}/api/users/${currentUser.id}/meetings`,
     );
     const meetings = response.data;
     return meetings;
-  }, [currentUser.id]);
+  }, [currentUser]);
 
   const handleButtonClick = async () => {
     const updatedData = await fetchData();
     setMeetingList(updatedData);
   };
 
-  const handleMeetingRequest = async (userId) => {
+  const handleMeetingRequest = async (userId: string) => {
     try {
       const response = await axios.get(`${LOGIN_API_URL}/api/users/${userId}`);
       navigation.navigate("MeetingRequest", {
@@ -51,16 +98,17 @@ export default function MeetingInfo() {
         userinfo: response.data,
       });
     } catch (error) {
+      console.log(error);
       navigateToLoginPage();
     }
   };
 
-  const handlePress = async (index) => {
+  const handlePress = async (index: number) => {
     setActiveButton(index);
     setExpandedCards(meetingList.map(() => false));
   };
 
-  const toggleCardExpansion = (index) => {
+  const toggleCardExpansion = (index: number) => {
     if (expandedCards.includes(index)) {
       setExpandedCards(
         expandedCards.filter((cardIndex) => cardIndex !== index),
@@ -70,7 +118,11 @@ export default function MeetingInfo() {
     }
   };
 
-  const handleAccept = async (id, expoPushToken, requesterName) => {
+  const handleAccept = async (
+    id: string,
+    expoPushToken: string,
+    requesterName: string,
+  ) => {
     const patchResponse = await axios.patch(
       `${LOGIN_API_URL}/api/meetings/${id}/accept`,
     );
@@ -85,7 +137,11 @@ export default function MeetingInfo() {
     }
   };
 
-  const handleCancel = async (userId, meetingId, time) => {
+  const handleCancel = async (
+    userId: string,
+    meetingId: string,
+    time: Date,
+  ) => {
     try {
       const patchResponse = await axios.patch(
         `${LOGIN_API_URL}/api/users/${userId}/cancel`,
@@ -99,16 +155,17 @@ export default function MeetingInfo() {
         handleButtonClick();
       }
     } catch (error) {
+      console.error(error);
       navigateToLoginPage();
     }
   };
 
   const handleRejected = async (
-    userId,
-    meetingId,
-    time,
-    expoPushToken,
-    requesterName,
+    userId: string,
+    meetingId: string,
+    time: Date,
+    expoPushToken: string,
+    requesterName: string,
   ) => {
     if (inputRejected.length === 0) {
       Alert.alert("Error", "거절 사유를 입력해주세요.");
@@ -140,11 +197,12 @@ export default function MeetingInfo() {
         }
       }
     } catch (error) {
+      console.error(error);
       navigateToLoginPage();
     }
   };
 
-  const completeMeeting = async (id, meetingId, time) => {
+  const completeMeeting = async (id: string, meetingId: string, time: Date) => {
     try {
       const patchResponse = await axios.patch(
         `${LOGIN_API_URL}/api/users/${id}/changeReservationTime`,
@@ -158,33 +216,42 @@ export default function MeetingInfo() {
         handleButtonClick();
       }
     } catch (error) {
+      console.error(error);
       navigateToLoginPage();
     }
   };
 
-  const handleDelete = async (meetingId) => {
+  const handleDelete = async (meetingId: string) => {
     try {
       await axios.delete(`${LOGIN_API_URL}/api/meetings/${meetingId}`);
       handleButtonClick();
     } catch (error) {
+      console.error(error);
       navigateToLoginPage();
     }
   };
 
-  const isMinutesPast = (meetingStartTime, minutes) => {
+  const isMinutesPast = (meetingStartTime: Date, minutes: number) => {
     const now = new Date();
     const meetingTime = new Date(meetingStartTime);
-    const nowLocal = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
-    const meetingTimeLocal = new Date(
+    const nowLocal: Date = new Date(
+      now.getTime() - now.getTimezoneOffset() * 60000,
+    );
+    const meetingTimeLocal: Date = new Date(
       meetingTime.getTime() - meetingTime.getTimezoneOffset() * 60000,
     );
-    const minuteDifference = (nowLocal - meetingTimeLocal) / 60000;
+    const minuteDifference =
+      (nowLocal.getTime() - meetingTimeLocal.getTime()) / 60000;
     return minuteDifference >= minutes;
   };
 
   useFocusEffect(
     useCallback(() => {
       async function fetchData() {
+        if (!currentUser) {
+          navigateToLoginPage();
+          return;
+        }
         const response = await axios.get(
           `${LOGIN_API_URL}/api/users/${currentUser.id}/meetings`,
         );
@@ -195,7 +262,11 @@ export default function MeetingInfo() {
     }, []),
   );
 
-  const filterMeetings = (status, isRequester) => {
+  const filterMeetings = (status: string, isRequester: boolean) => {
+    if (!currentUser) {
+      navigateToLoginPage();
+      return;
+    }
     const filteredMeeting = meetingList.filter(
       (meeting) =>
         meeting.status === status &&
@@ -316,7 +387,8 @@ export default function MeetingInfo() {
                     onPress={() =>
                       handleAccept(
                         meeting._id,
-                        meeting.requestee.expoPushToken,
+                        meeting.requestee.expoPushToken ||
+                          "default expoPushToken",
                         meeting.requester.name,
                       )
                     }
@@ -331,7 +403,8 @@ export default function MeetingInfo() {
                         meeting.requester.id,
                         meeting._id,
                         meeting.startTime,
-                        meeting.requestee.expoPushToken,
+                        meeting.requestee.expoPushToken ||
+                          "default expoPushToken",
                         meeting.requester.name,
                       )
                     }
@@ -370,12 +443,12 @@ export default function MeetingInfo() {
       </View>
     ));
   };
-  const renderButton = (text, index) => (
+  const renderButton = (text: string, index: number) => (
     <TouchableOpacity
       key={index}
       style={[
         styles.button,
-        activeButton === index && { backgroundColor: "#594545" },
+        activeButton === index && { backgroundColor: COLOR_LIGHTBROWN },
       ]}
       onPress={() => handlePress(index)}
     >
@@ -403,11 +476,11 @@ export default function MeetingInfo() {
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    backgroundColor: "#FFF8EA",
+    backgroundColor: COLOR_BEIGE,
     flex: 1,
   },
   container: {
-    backgroundColor: "#FFF8EA",
+    backgroundColor: COLOR_BEIGE,
     marginTop: 5,
     alignItems: "center",
     justifyContent: "center",
@@ -424,7 +497,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   button: {
-    backgroundColor: "#9E7676",
+    backgroundColor: COLOR_BROWN,
     padding: 10,
     width: "22%",
     marginRight: 5,
@@ -442,7 +515,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 14,
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   meetingListContainer: {
@@ -452,7 +525,7 @@ const styles = StyleSheet.create({
   meetingCard: {
     alignItems: "center",
     flexDirection: "column",
-    backgroundColor: "#9E7676",
+    backgroundColor: COLOR_BROWN,
     width: 300,
     padding: 10,
     borderWidth: 2,
@@ -469,13 +542,13 @@ const styles = StyleSheet.create({
   cardName: {
     fontSize: 20,
     marginLeft: 5,
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   cardText: {
     marginLeft: 5,
     fontSize: 17,
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   notFoundCardText: {
@@ -503,8 +576,8 @@ const styles = StyleSheet.create({
   },
   meetingContentContainer: {
     justifyContent: "center",
-    backgroundColor: "#9E7676",
-    borderColor: "#594545",
+    backgroundColor: COLOR_BROWN,
+    borderColor: COLOR_LIGHTBROWN,
     marginTop: 5,
     width: 280,
     height: 70,
@@ -519,7 +592,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   meetingButton: {
-    backgroundColor: "#815B5B",
+    backgroundColor: COLOR_MAHOGANYBROWN,
     padding: 10,
     width: 100,
     height: 40,
@@ -546,13 +619,13 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     width: "100%",
     height: 30,
-    backgroundColor: "#FFF8EA",
+    backgroundColor: COLOR_BEIGE,
   },
   inputText: {
     marginLeft: 5,
     marginTop: 10,
     fontSize: 17,
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
 });
