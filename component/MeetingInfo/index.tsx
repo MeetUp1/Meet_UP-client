@@ -98,7 +98,7 @@ export default function MeetingInfo() {
         userinfo: response.data,
       });
     } catch (error) {
-      console.log(error);
+      console.error(error);
       navigateToLoginPage();
     }
   };

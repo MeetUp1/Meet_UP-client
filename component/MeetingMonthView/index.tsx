@@ -1,5 +1,7 @@
+import React from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 
+import { COLOR_BEIGE, COLOR_LIGHTBROWN } from "../../constants/color";
 import { getDaysInMonth, getFirstDayInMonth } from "../../features/utils";
 
 const MeetingMonthView = ({
@@ -17,7 +19,7 @@ const MeetingMonthView = ({
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const onDayPress = (day) => {
+  const onDayPress = (day: Date) => {
     setSelectedDate(day);
     onDaySelected(day);
   };
@@ -94,7 +96,7 @@ const styles = StyleSheet.create({
   weekDayText: {
     fontSize: 17,
     textAlign: "center",
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   daysContainer: {
@@ -113,19 +115,19 @@ const styles = StyleSheet.create({
   dayText: {
     fontSize: 15,
     textAlign: "center",
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   today: {
-    backgroundColor: "#594545",
+    backgroundColor: COLOR_LIGHTBROWN,
     borderRadius: 50,
   },
   todayText: {
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   selectedDay: {
-    borderColor: "#594545",
+    borderColor: COLOR_LIGHTBROWN,
     borderWidth: 2,
     borderRadius: 50,
   },

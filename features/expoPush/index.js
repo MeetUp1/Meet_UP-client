@@ -12,7 +12,7 @@ async function sendNotification(expoPushToken, title, message) {
   try {
     await axios.post("https://exp.host/--/api/v2/push/send", data);
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 
