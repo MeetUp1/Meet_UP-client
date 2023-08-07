@@ -290,12 +290,12 @@ export default function RequestCalendar({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#FFF8EA",
+    backgroundColor: COLOR_BEIGE,
     alignItems: "center",
     marginTop: 10,
   },
   buttonContainer: {
-    backgroundColor: "#FFF8EA",
+    backgroundColor: COLOR_BEIGE,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 10,
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     width: "90%",
-    backgroundColor: "#9E7676",
+    backgroundColor: COLOR_BROWN,
   },
   timePeriodContainer: {
     flexDirection: "row",
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 25,
     marginHorizontal: 10,
-    backgroundColor: "#9E7676",
+    backgroundColor: COLOR_BROWN,
     width: "22%",
     marginRight: 5,
     alignItems: "center",
@@ -338,14 +338,14 @@ const styles = StyleSheet.create({
   },
   timePeriodText: {
     fontSize: 20,
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   timePeriodSelected: {
-    backgroundColor: "#594545",
+    backgroundColor: COLOR_LIGHTBROWN,
   },
   timePeriodSelectedText: {
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   hoursContainer: {
@@ -369,10 +369,10 @@ const styles = StyleSheet.create({
     fontFamily: "Jua",
   },
   selectedHour: {
-    backgroundColor: "#9E7676",
+    backgroundColor: COLOR_BROWN,
   },
   selectedHourText: {
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   nextButton: {
@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 15,
     borderWidth: 2,
-    backgroundColor: "#9E7676",
+    backgroundColor: COLOR_BROWN,
     shadowColor: "#000",
     shadowOffset: {
       width: 1,
@@ -397,11 +397,11 @@ const styles = StyleSheet.create({
   },
   nextButtonText: {
     fontSize: 20,
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   unavailableHour: {
-    backgroundColor: "#594545",
+    backgroundColor: COLOR_LIGHTBROWN,
   },
   unavailableHourText: {
     color: "#999",
