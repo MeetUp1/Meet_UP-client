@@ -1,5 +1,6 @@
 import { LOGIN_API_URL } from "@env";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
 import axios from "axios";
 import React, { useState, useMemo, useCallback } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
@@ -12,6 +13,11 @@ import Animated, {
   runOnJS,
 } from "react-native-reanimated";
 
+import {
+  COLOR_BEIGE,
+  COLOR_BROWN,
+  COLOR_LIGHTBROWN,
+} from "../../constants/color";
 import CalendarHeader from "../CalendarHeader";
 import RequestMonthView from "../RequestMonthview";
 
@@ -21,17 +27,23 @@ export default function RequestCalendar({
   setSelectUserUTCTime,
   prevStep,
 }) {
-  const [date, setDate] = useState(new Date());
-  const [timePeriod, setTimePeriod] = useState("AM");
-  const [selectedHours, setSelectedHours] = useState([]);
-  const [selectUserTime, setSelectUserTime] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(() => {
+  type RootStackParamList = {
+    ErrorPage: undefined;
+  };
+  type NavigationProp = StackNavigationProp<RootStackParamList>;
+
+  const [date, setDate] = useState<Date>(new Date());
+  const [timePeriod, setTimePeriod] = useState<string>("AM");
+  const [selectedHours, setSelectedHours] = useState<number[]>([]);
+  const [selectUserTime, setSelectUserTime] = useState<Date[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date>(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     return today;
   });
-  const navigation = useNavigation();
+
+  const navigation = useNavigation<NavigationProp>();
 
   const navigateToLoginPage = () => {
     navigation.navigate("ErrorPage");
@@ -76,11 +88,11 @@ export default function RequestCalendar({
     }
   };
 
-  const onTimePeriodChange = (period) => {
+  const onTimePeriodChange = (period: string) => {
     setTimePeriod(period);
   };
 
-  const onHourSelect = (hour) => {
+  const onHourSelect = (hour: number) => {
     if (selectedHours.includes(hour)) {
       setSelectedHours(
         selectedHours.filter((selectedHour) => selectedHour !== hour),
@@ -118,7 +130,7 @@ export default function RequestCalendar({
     };
   });
 
-  const convertToLocalDate = (utcDate) => {
+  const convertToLocalDate = (utcDate: Date) => {
     const date = new Date(utcDate);
     return date;
   };
@@ -137,7 +149,7 @@ export default function RequestCalendar({
       );
   }, [selectUserTime, selectedDate]);
 
-  const convertToUTCDate = (localDate, hour) => {
+  const convertToUTCDate = (localDate: Date, hour: number) => {
     const date = new Date(localDate);
     date.setHours(hour, 0, 0, 0);
     return date.toISOString();
@@ -153,6 +165,7 @@ export default function RequestCalendar({
           const openTime = response.data.openTime || null;
           setSelectUserTime(openTime);
         } catch (error) {
+          console.error(error);
           navigateToLoginPage();
         }
       }
