@@ -1,5 +1,6 @@
 import { LOGIN_API_URL } from "@env";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
 import axios from "axios";
 import React, { useState, useRef, useCallback } from "react";
 import {
@@ -14,33 +15,49 @@ import {
 } from "react-native";
 import { useSelector } from "react-redux";
 
+import { COLOR_BEIGE, COLOR_BROWN } from "../../constants/color";
 import sendNotification from "../../features/expoPush";
+import { LoginState } from "../../store/types";
+import { User } from "../../types/types";
 import RequestCalendar from "../RequestCalendar";
 
 export default function MeetingRequest({ route }) {
-  const [step, setStep] = useState(route.params ? route.params.initialStep : 1);
-  const [searchUser, setSearchUser] = useState(
+  type RootStackParamList = {
+    ErrorPage: undefined;
+    MeetingSchedule: {
+      showSnackbar: boolean;
+      text: string;
+    };
+  };
+  type NavigationProp = StackNavigationProp<RootStackParamList>;
+
+  const [step, setStep] = useState<number>(
+    route.params ? route.params.initialStep : 1,
+  );
+  const [searchUser, setSearchUser] = useState<string>(
     route.params ? route.params.userinfo.name : "",
   );
-  const [foundUsers, setFoundUsers] = useState(
+  const [foundUsers, setFoundUsers] = useState<User[]>(
     route.params ? [route.params.userinfo] : [],
   );
-  const [selectedUser, setSelectedUser] = useState(
+  const [selectedUser, setSelectedUser] = useState<User | object>(
     route.params ? route.params.userinfo : {},
   );
-  const [content, setContent] = useState("");
-  const [address, setAddress] = useState("");
-  const [userList, setUserList] = useState([]);
-  const [selectUserUTCTime, setSelectUserUTCTime] = useState("");
+  const [content, setContent] = useState<string>("");
+  const [address, setAddress] = useState<string>("");
+  const [userList, setUserList] = useState<User[]>([]);
+  const [selectUserUTCTime, setSelectUserUTCTime] = useState<Date | string>(
+    new Date(),
+  );
 
-  const { currentUser } = useSelector((state) => state);
-  const { expoPushToken } = useSelector((state) => state);
+  const { currentUser } = useSelector((state: LoginState) => state);
+  const { expoPushToken } = useSelector((state: LoginState) => state);
+
+  const navigation = useNavigation<NavigationProp>();
 
   const stepAnimation = useRef(
     new Animated.Value(route.params ? route.params.initialStep - 1 : 0),
   ).current;
-
-  const navigation = useNavigation();
 
   const navigateToLoginPage = () => {
     navigation.navigate("ErrorPage");
@@ -59,21 +76,21 @@ export default function MeetingRequest({ route }) {
     stepAnimation.setValue(route.params ? route.params.initialStep - 1 : 0);
   };
 
-  const inputContent = (text) => {
+  const inputContent = (text: string) => {
     setContent(text);
   };
 
-  const inputAddress = (text) => {
+  const inputAddress = (text: string) => {
     setAddress(text);
   };
 
-  const searchUserName = (text) => {
+  const searchUserName = (text: string) => {
     setSearchUser(text);
     const users = userList.filter((user) => user.name === text);
     setFoundUsers(users);
   };
 
-  const selectUser = (user) => {
+  const selectUser = (user: User) => {
     if (selectedUser === user) {
       setSelectedUser({});
     } else {
@@ -81,15 +98,15 @@ export default function MeetingRequest({ route }) {
     }
   };
 
-  const userContainerStyle = (user) => {
+  const userContainerStyle = (user: User) => {
     return selectedUser === user
-      ? [styles.userContainer, { backgroundColor: "#9E7676" }]
+      ? [styles.userContainer, { backgroundColor: COLOR_BROWN }]
       : styles.userContainer;
   };
 
-  const userTextStyle = (user) => {
+  const userTextStyle = (user: User) => {
     return selectedUser === user
-      ? [styles.profileText, { color: "#FFF8EA" }]
+      ? [styles.profileText, { color: COLOR_BEIGE }]
       : styles.profileText;
   };
 
@@ -128,39 +145,47 @@ export default function MeetingRequest({ route }) {
         toValue: step - 2,
         duration: 800,
         useNativeDriver: true,
-      }).start(setStep(step - 1));
+      }).start(() => setStep(step - 1));
     }
   };
 
   const handleChangeSchedule = async () => {
     try {
-      const patchRequest = await axios.patch(
-        `${LOGIN_API_URL}/api/users/${selectedUser.id}/changeTime`,
-        {
-          selectUserUTCTime,
-        },
-      );
-      if (patchRequest.status === 200) {
-        const postRequest = await axios.post(
-          `${LOGIN_API_URL}/api/meetings/new`,
+      if (!currentUser) {
+        navigateToLoginPage();
+        return;
+      }
+
+      if (typeof selectedUser === "object" && "id" in selectedUser) {
+        const patchRequest = await axios.patch(
+          `${LOGIN_API_URL}/api/users/${selectedUser.id}/changeTime`,
           {
-            title: content,
-            location: address,
-            startTime: selectUserUTCTime,
-            requester: selectedUser,
-            requestee: { ...currentUser, expoPushToken },
+            selectUserUTCTime,
           },
         );
-        if (postRequest.status === 200) {
-          await sendNotification(
-            selectedUser.expoPushToken,
-            "새로운 미팅이 신청되었습니다!",
-            `${currentUser.name}님이 미팅을 신청하였습니다.`,
+        if (patchRequest.status === 200) {
+          const postRequest = await axios.post(
+            `${LOGIN_API_URL}/api/meetings/new`,
+            {
+              title: content,
+              location: address,
+              startTime: selectUserUTCTime,
+              requester: selectedUser,
+              requestee: { ...currentUser, expoPushToken },
+            },
           );
-          handleMeetingSchedule();
+          if (postRequest.status === 200) {
+            await sendNotification(
+              selectedUser.expoPushToken,
+              "새로운 미팅이 신청되었습니다!",
+              `${currentUser.name}님이 미팅을 신청하였습니다.`,
+            );
+            handleMeetingSchedule();
+          }
         }
       }
     } catch (error) {
+      console.error(error);
       navigateToLoginPage();
     }
   };
@@ -333,14 +358,14 @@ export default function MeetingRequest({ route }) {
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    backgroundColor: "#FFF8EA",
+    backgroundColor: COLOR_BEIGE,
     flex: 1,
   },
   container: {
     alignItems: "center",
     justifyContent: "center",
     marginTop: 20,
-    backgroundColor: "#FFF8EA",
+    backgroundColor: COLOR_BEIGE,
   },
   buttonContainer: {
     marginTop: 10,
@@ -448,7 +473,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 15,
     borderWidth: 2,
-    backgroundColor: "#9E7676",
+    backgroundColor: COLOR_BROWN,
     shadowColor: "#000",
     shadowOffset: {
       width: 1,
@@ -459,7 +484,7 @@ const styles = StyleSheet.create({
   },
   nextButtonText: {
     fontSize: 20,
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   animatedView: {
@@ -473,13 +498,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 20,
     borderWidth: 2,
-    backgroundColor: "#9E7676",
+    backgroundColor: COLOR_BROWN,
   },
   contentText: {
     fontSize: 20,
     marginTop: 15,
     marginLeft: 25,
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   contentInput: {
@@ -489,7 +514,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     width: "90%",
     height: 50,
-    backgroundColor: "#FFF8EA",
+    backgroundColor: COLOR_BEIGE,
   },
   meetingContentContainer: {
     alignItems: "center",

@@ -15,6 +15,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSelector } from "react-redux";
 
+import { COLOR_BEIGE, COLOR_BROWN } from "../../constants/color";
 import { LoginState } from "../../store/types";
 import { Meeting } from "../../types/types";
 import CalendarHeader from "../CalendarHeader";
@@ -261,11 +262,11 @@ export default function MeetingSchedule({ route }) {
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    backgroundColor: "#FFF8EA",
+    backgroundColor: COLOR_BEIGE,
     flex: 1,
   },
   container: {
-    backgroundColor: "#FFF8EA",
+    backgroundColor: COLOR_BEIGE,
     alignItems: "center",
     marginBottom: 10,
   },
@@ -275,7 +276,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     width: "90%",
-    backgroundColor: "#9E7676",
+    backgroundColor: COLOR_BROWN,
   },
   snackbar: {
     position: "absolute",
@@ -288,7 +289,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   scheduleCard: {
-    backgroundColor: "#9E7676",
+    backgroundColor: COLOR_BROWN,
   },
   noScheduleText: {
     textAlign: "center",
