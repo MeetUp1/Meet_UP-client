@@ -2,7 +2,7 @@
   "expo": {
     "name": "MeetUp-client",
     "slug": "MeetUp-client",
-    "scheme": "MeetUp",
+    "scheme": "meetup",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

@@ -1,4 +1,4 @@
-export interface User {
+export type User = {
   email: string;
   family_name: string;
   given_name: string;
@@ -7,9 +7,9 @@ export interface User {
   name: string;
   picture: string;
   verified_email: boolean;
-}
+};
 
-export interface LoginState {
+export type LoginState = {
   currentUser: User | null;
   expoPushToken: string;
-}
+};

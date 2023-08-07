@@ -1,12 +1,12 @@
 import React from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 
-interface CalendarHeaderProps {
+type CalendarHeaderProps = {
   month: number;
   year: number;
   onPrev: () => void;
   onNext: () => void;
-}
+};
 
 const CalendarHeader = ({
   month,

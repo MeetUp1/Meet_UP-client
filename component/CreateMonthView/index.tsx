@@ -9,12 +9,12 @@ import {
 } from "../../constants/color";
 import { getDaysInMonth, getFirstDayInMonth } from "../../features/utils";
 
-interface CreateMonthViewProps {
+type CreateMonthViewProps = {
   month: number;
   year: number;
   selectedDate: Date;
   setSelectedDate: (date: Date) => void;
-}
+};
 
 const CreateMonthView = ({
   month,

@@ -24,6 +24,7 @@ import {
 } from "../../constants/color";
 import sendNotification from "../../features/expoPush";
 import { LoginState } from "../../store/types";
+import { Meeting } from "../../types/types";
 
 export default function MeetingInfo() {
   type RootStackParamList = {
@@ -34,32 +35,6 @@ export default function MeetingInfo() {
     };
   };
   type NavigationProp = StackNavigationProp<RootStackParamList>;
-  type User = {
-    email: string;
-    family_name: string;
-    given_name: string;
-    id: string;
-    locale: string;
-    name: string;
-    picture: string;
-    verified_email: boolean;
-    expoPushToken?: string;
-    __v?: number;
-    _id?: string;
-    openTime?: Date[];
-    reservationTime?: Date[];
-  };
-  type Meeting = {
-    __v: number;
-    _id: string;
-    location: string;
-    requestee: User;
-    requester: User;
-    startTime: Date;
-    status: string;
-    title: string;
-    message?: string;
-  };
 
   const [activeButton, setActiveButton] = useState<number>(0);
   const [expandedCards, setExpandedCards] = useState<(boolean | number)[]>([]);

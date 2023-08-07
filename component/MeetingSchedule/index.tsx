@@ -1,5 +1,6 @@
 import { LOGIN_API_URL } from "@env";
-import { useFocusEffect } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
 import axios from "axios";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { StyleSheet, Text, View, ScrollView, Platform } from "react-native";
@@ -14,22 +15,31 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSelector } from "react-redux";
 
+import { LoginState } from "../../store/types";
+import { Meeting } from "../../types/types";
 import CalendarHeader from "../CalendarHeader";
 import MeetingMonthView from "../MeetingMonthView";
 import ScheduleCard from "../ScheduleCard";
 
 export default function MeetingSchedule({ route }) {
-  const [visibleSnackbar, setVisibleSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [date, setDate] = useState(new Date());
-  const [meetingList, setMeetingList] = useState([]);
-  const [selectedDateMeetings, setSelectedDateMeetings] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  type RootStackParamList = {
+    ErrorPage: undefined;
+  };
+  type NavigationProp = StackNavigationProp<RootStackParamList>;
 
+  const [visibleSnackbar, setVisibleSnackbar] = useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string>("");
+  const [date, setDate] = useState<Date>(new Date());
+  const [meetingList, setMeetingList] = useState<Meeting[]>([]);
+  const [selectedDateMeetings, setSelectedDateMeetings] = useState<Meeting[]>(
+    [],
+  );
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const month = date.getMonth();
   const year = date.getFullYear();
 
-  const { currentUser } = useSelector((state) => state);
+  const navigation = useNavigation<NavigationProp>();
+  const { currentUser } = useSelector((state: LoginState) => state);
 
   const onPrevMonth = () => {
     const newDate = new Date(year, month - 1, 1);
@@ -93,11 +103,19 @@ export default function MeetingSchedule({ route }) {
     };
   });
 
+  const navigateToLoginPage = () => {
+    navigation.navigate("ErrorPage");
+  };
+
   const onDismissSnackBar = () => {
     setVisibleSnackbar(false);
   };
 
-  const getMeetingsByDate = (meetingList, month, year) => {
+  const getMeetingsByDate = (
+    meetingList: Meeting[],
+    month: number,
+    year: number,
+  ) => {
     const meetingsByDate = {};
 
     meetingList.forEach((meeting) => {
@@ -117,7 +135,7 @@ export default function MeetingSchedule({ route }) {
     return meetingsByDate;
   };
 
-  const onDaySelected = (selectedDate) => {
+  const onDaySelected = (selectedDate: Date) => {
     const selectedDateMeetings = meetingsByDate[selectedDate.getDate()] || [];
     setSelectedDateMeetings(selectedDateMeetings);
   };
@@ -141,6 +159,10 @@ export default function MeetingSchedule({ route }) {
   useFocusEffect(
     useCallback(() => {
       async function fetchData() {
+        if (!currentUser) {
+          navigateToLoginPage();
+          return;
+        }
         const response = await axios.get(
           `${LOGIN_API_URL}/api/users/${currentUser.id}/meetings/accepted`,
         );
@@ -178,36 +200,50 @@ export default function MeetingSchedule({ route }) {
           </PanGestureHandler>
         </View>
         <View style={styles.scheduleCardContainer}>
-          {selectedDateMeetings.map((meeting) => (
-            <ScheduleCard
-              key={meeting._id}
-              name={
-                currentUser.name === meeting.requester.name
-                  ? meeting.requestee.name
-                  : `${meeting.requester.name}🤝`
-              }
-              time={
-                Platform.OS === "android"
-                  ? new Date(meeting.startTime).toLocaleString().slice(0, 16)
-                  : new Date(meeting.startTime).toLocaleString()[20] === "0"
-                  ? new Date(meeting.startTime).toLocaleString().slice(0, 21)
-                  : new Date(meeting.startTime).toLocaleString().slice(0, 20)
-              }
-              agenda={meeting.title}
-              address={meeting.location}
-              picture={
-                currentUser.name === meeting.requester.name
-                  ? meeting.requestee.picture
-                  : meeting.requester.picture
-              }
-              onCopy={() => {
-                setSnackbarMessage("미팅 주소가 복사되었습니다.");
-                setVisibleSnackbar(true);
-              }}
-            />
-          ))}
-          {selectedDateMeetings.length === 0 && (
-            <Text style={styles.noScheduleText}>일정이 없습니다</Text>
+          {currentUser ? (
+            <>
+              {selectedDateMeetings.map((meeting) => (
+                <ScheduleCard
+                  key={meeting._id}
+                  name={
+                    currentUser.name === meeting.requester.name
+                      ? meeting.requestee.name
+                      : `${meeting.requester.name}🤝`
+                  }
+                  time={
+                    Platform.OS === "android"
+                      ? new Date(meeting.startTime)
+                          .toLocaleString()
+                          .slice(0, 16)
+                      : new Date(meeting.startTime).toLocaleString()[20] === "0"
+                      ? new Date(meeting.startTime)
+                          .toLocaleString()
+                          .slice(0, 21)
+                      : new Date(meeting.startTime)
+                          .toLocaleString()
+                          .slice(0, 20)
+                  }
+                  agenda={meeting.title}
+                  address={meeting.location}
+                  picture={
+                    currentUser.name === meeting.requester.name
+                      ? meeting.requestee.picture
+                      : meeting.requester.picture
+                  }
+                  onCopy={() => {
+                    setSnackbarMessage("미팅 주소가 복사되었습니다.");
+                    setVisibleSnackbar(true);
+                  }}
+                />
+              ))}
+              {selectedDateMeetings.length === 0 && (
+                <Text style={styles.noScheduleText}>일정이 없습니다</Text>
+              )}
+            </>
+          ) : (
+            <Text style={styles.noScheduleText}>
+              Current user is not available
+            </Text>
           )}
         </View>
       </ScrollView>
