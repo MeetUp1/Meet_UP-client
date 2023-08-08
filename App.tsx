@@ -16,8 +16,8 @@ async function loadFonts(): Promise<void> {
       GamjaFlower: require("./assets/fonts/GamjaFlower-Regular.ttf"),
       Jua: require("./assets/fonts/Jua-Regular.ttf"),
     });
-  } catch (e: any) {
-    console.warn(e);
+  } catch (error) {
+    console.warn(error);
   }
 }
 
@@ -28,8 +28,8 @@ const App = () => {
     async function prepare() {
       try {
         await loadFonts();
-      } catch (e: any) {
-        console.warn(e);
+      } catch (error) {
+        console.warn(error);
       } finally {
         setTimeout(() => {
           setIsReady(true);

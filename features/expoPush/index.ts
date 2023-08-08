@@ -1,6 +1,10 @@
 import axios from "axios";
 
-async function sendNotification(expoPushToken, title, message) {
+async function sendNotification(
+  expoPushToken: string,
+  title: string,
+  message: string,
+) {
   const data = {
     to: expoPushToken,
     sound: "default",

@@ -7,6 +7,7 @@ import ErrorPage from "./index";
 jest.mock("@react-navigation/native", () => ({
   useNavigation: jest.fn(),
 }));
+const mockNavigate = jest.fn();
 
 describe("ErrorPage", () => {
   it("renders correctly", () => {
@@ -16,8 +17,7 @@ describe("ErrorPage", () => {
   });
 
   it("navigates to login page when retry button is pressed", () => {
-    const mockNavigate = jest.fn();
-    useNavigation.mockReturnValue({ navigate: mockNavigate });
+    (useNavigation as jest.Mock).mockReturnValue({ navigate: mockNavigate });
 
     const { getByText } = render(<ErrorPage />);
     fireEvent.press(getByText("로그인 페이지로 이동"));

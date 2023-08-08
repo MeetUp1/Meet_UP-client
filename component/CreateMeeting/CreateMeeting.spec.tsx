@@ -42,10 +42,18 @@ describe("CreateMeeting", () => {
     const pmButton = getByText("오후");
 
     fireEvent.press(amButton);
-    expect(queryByTestId("timePeriodTextAM").props.children).toEqual("오전");
+    const timePeriodTextAM = queryByTestId("timePeriodTextAM");
+    expect(timePeriodTextAM).not.toBeNull();
+    if (timePeriodTextAM) {
+      expect(timePeriodTextAM.props.children).toEqual("오전");
+    }
 
     fireEvent.press(pmButton);
-    expect(queryByTestId("timePeriodTextPM").props.children).toEqual("오후");
+    const timePeriodTextPM = queryByTestId("timePeriodTextPM");
+    expect(timePeriodTextPM).not.toBeNull();
+    if (timePeriodTextPM) {
+      expect(timePeriodTextPM.props.children).toEqual("오후");
+    }
   });
 
   it("selects hours correctly", () => {
@@ -69,7 +77,7 @@ describe("CreateMeeting", () => {
 
   it("handles meeting schedule submission", async () => {
     const mockNavigation = { navigate: jest.fn() };
-    useNavigation.mockReturnValue(mockNavigation);
+    (useNavigation as jest.Mock).mockReturnValue(mockNavigation);
 
     const { getByText } = render(
       <Provider store={store}>
@@ -81,7 +89,7 @@ describe("CreateMeeting", () => {
 
     const meetingScheduleButton = getByText("시간등록");
 
-    axios.patch.mockResolvedValue({ status: 200 });
+    jest.mocked(axios.patch).mockResolvedValue({ status: 200 } as any);
 
     fireEvent.press(meetingScheduleButton);
 

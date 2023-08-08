@@ -24,6 +24,8 @@ import { useDispatch } from "react-redux";
 import { COLOR_BEIGE, COLOR_BROWN, COLOR_RED } from "../../constants/color";
 import { userLogin, expoToken } from "../../features/reducers/loginSlice";
 
+import { Prompt } from "/Users/snaghyuk/Documents/MeetUP/MeetUp-client/node_modules/expo-auth-session/build/AuthRequest.types";
+
 WebBrowser.maybeCompleteAuthSession();
 
 export async function registerForPushNotificationsAsync() {
@@ -77,7 +79,7 @@ export default function Login() {
     clientId: CLIENT_ID,
     iosClientId: IOS_CLIENT_ID,
     androidClientId: ANDROID_CLIENT_ID,
-    prompt: "select_account" as any,
+    prompt: "select_account" as Prompt | undefined,
   });
 
   const navigateToLoginPage = () => {

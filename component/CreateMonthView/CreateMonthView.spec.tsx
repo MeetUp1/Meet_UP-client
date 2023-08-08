@@ -71,7 +71,7 @@ describe("CreateMonthView", () => {
       <CreateMonthView
         month={pastDate.getMonth()}
         year={pastDate.getFullYear()}
-        selectedDate={null}
+        selectedDate={new Date()}
         setSelectedDate={mockSetSelectedDate}
       />,
     );
@@ -88,7 +88,7 @@ describe("CreateMonthView", () => {
       <CreateMonthView
         month={today.getMonth()}
         year={today.getFullYear()}
-        selectedDate={null}
+        selectedDate={new Date()}
         setSelectedDate={mockSetSelectedDate}
       />,
     );

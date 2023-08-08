@@ -22,10 +22,10 @@ describe("Header", () => {
   };
 
   beforeEach(() => {
-    useSelector.mockImplementation((selector) =>
+    (useSelector as jest.Mock).mockImplementation((selector) =>
       selector({ currentUser: mockCurrentUser }),
     );
-    useNavigation.mockReturnValue(mockNavigation);
+    (useNavigation as jest.Mock).mockReturnValue(mockNavigation);
   });
 
   afterEach(() => {

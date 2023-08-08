@@ -1,6 +1,5 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { render, fireEvent } from "@testing-library/react-native";
-import * as expoNotifications from "expo-notifications";
 import React from "react";
 import { Provider } from "react-redux";
 
@@ -28,10 +27,17 @@ jest.mock("expo-device", () => ({
   isDevice: true,
 }));
 
+const mockGetExpoPushTokenAsync = jest
+  .fn()
+  .mockResolvedValue({ data: "mock-token" });
+const mockGetPermissionsAsync = jest
+  .fn()
+  .mockResolvedValue({ status: "granted" });
+
 jest.mock("expo-notifications", () => ({
-  getPermissionsAsync: jest.fn(),
+  getPermissionsAsync: mockGetPermissionsAsync,
   requestPermissionsAsync: jest.fn(),
-  getExpoPushTokenAsync: jest.fn(),
+  getExpoPushTokenAsync: mockGetExpoPushTokenAsync,
   setNotificationChannelAsync: jest.fn(),
   AndroidImportance: {
     MAX: "MAX",
@@ -72,10 +78,11 @@ describe("Login", () => {
   it("should return token when permissions are granted", async () => {
     const mockToken = "mock-token";
 
-    expoNotifications.getPermissionsAsync.mockResolvedValue({
+    mockGetPermissionsAsync.mockResolvedValue({
       status: "granted",
     });
-    expoNotifications.getExpoPushTokenAsync.mockResolvedValue({
+
+    mockGetExpoPushTokenAsync.mockResolvedValue({
       data: mockToken,
     });
 

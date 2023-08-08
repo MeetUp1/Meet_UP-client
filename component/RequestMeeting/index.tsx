@@ -174,7 +174,7 @@ export default function MeetingRequest({ route }) {
               requestee: { ...currentUser, expoPushToken },
             },
           );
-          if (postRequest.status === 200) {
+          if (postRequest.status === 200 && selectedUser.expoPushToken) {
             await sendNotification(
               selectedUser.expoPushToken,
               "새로운 미팅이 신청되었습니다!",
