@@ -1,5 +1,11 @@
+import React from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 
+import {
+  COLOR_BEIGE,
+  COLOR_GRAY,
+  COLOR_LIGHTBROWN,
+} from "../../constants/color";
 import { getDaysInMonth, getFirstDayInMonth } from "../../features/utils";
 
 const RequestMonthView = ({
@@ -16,15 +22,15 @@ const RequestMonthView = ({
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const onDayPress = (day) => {
+  const onDayPress = (day: Date) => {
     setSelectedDate(day);
   };
 
-  const getMeetingCountForDate = (date) => {
+  const getMeetingCountForDate = (date: Date) => {
     return selectUserTime
-      .map((time) => new Date(time))
+      .map((time: Date) => new Date(time))
       .filter(
-        (time) =>
+        (time: Date) =>
           time.getFullYear() === date.getFullYear() &&
           time.getMonth() === date.getMonth() &&
           time.getDate() === date.getDate(),
@@ -109,7 +115,7 @@ const styles = StyleSheet.create({
   weekDayText: {
     fontSize: 17,
     textAlign: "center",
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   daysContainer: {
@@ -128,19 +134,19 @@ const styles = StyleSheet.create({
   dayText: {
     fontSize: 15,
     textAlign: "center",
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   today: {
-    backgroundColor: "#594545",
+    backgroundColor: COLOR_LIGHTBROWN,
     borderRadius: 50,
   },
   todayText: {
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   selectedDay: {
-    borderColor: "#594545",
+    borderColor: COLOR_LIGHTBROWN,
     borderWidth: 2,
     borderRadius: 50,
   },
@@ -156,7 +162,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   pastDateText: {
-    color: "#A0A0A0",
+    color: COLOR_GRAY,
     fontSize: 15,
     fontFamily: "Jua",
   },

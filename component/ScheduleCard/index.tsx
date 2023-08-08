@@ -9,8 +9,14 @@ import {
   Dimensions,
 } from "react-native";
 
+import {
+  COLOR_BEIGE,
+  COLOR_BROWN,
+  COLOR_LIGHTBROWN,
+} from "../../constants/color";
+
 const ScheduleCard = ({ name, time, agenda, address, picture, onCopy }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState<boolean>(false);
 
   const toggleExpanded = () => {
     setExpanded(!expanded);
@@ -43,7 +49,6 @@ const ScheduleCard = ({ name, time, agenda, address, picture, onCopy }) => {
             <TouchableOpacity
               onLongPress={copyToClipboard}
               delayLongPress={1000}
-              style={styles.subtitleContentTouchable}
             >
               <Text style={styles.subtitleContent}>{address}</Text>
             </TouchableOpacity>
@@ -58,7 +63,7 @@ const { width: screenWidth } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#9E7676",
+    backgroundColor: COLOR_BROWN,
     borderRadius: 20,
     marginTop: 10,
     marginBottom: 10,
@@ -69,12 +74,12 @@ const styles = StyleSheet.create({
   cardTitle: {
     marginRight: 5,
     fontSize: screenWidth * 0.05,
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   cardTime: {
     fontSize: screenWidth * 0.043,
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   cardDetails: {
@@ -83,12 +88,12 @@ const styles = StyleSheet.create({
   subtitleTitle: {
     fontSize: screenWidth * 0.045,
     marginBottom: 5,
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   subtitleContainer: {
-    backgroundColor: "#9E7676",
-    borderColor: "#594545",
+    backgroundColor: COLOR_BROWN,
+    borderColor: COLOR_LIGHTBROWN,
     borderRadius: 10,
     marginTop: 5,
     marginBottom: 10,
@@ -98,7 +103,7 @@ const styles = StyleSheet.create({
   },
   subtitleContent: {
     fontSize: screenWidth * 0.04,
-    color: "#FFF8EA",
+    color: COLOR_BEIGE,
     fontFamily: "Jua",
   },
   profileImgContainer: {
