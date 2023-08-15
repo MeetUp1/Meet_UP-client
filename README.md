@@ -5,7 +5,7 @@
 </p>
 <p align="center">MeetUP 프로젝트는 전 세계의 다양한 지역에서 미팅을 개최하고 참가할 수 있는 Mobile application 입니다.</p>
 <br>
-<p align="center"><a href="https://www.youtube.com/watch?v=bhVkFiCH_gU">MeetUP 시연영상</a></p>
+<p align="center"><a href="https://www.youtube.com/watch?v=diMs3qCZ96w">MeetUP 시연영상</a></p>
 
 <br>
 <br>
